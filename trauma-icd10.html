@@ -759,6 +759,16 @@ $("#copyAll").addEventListener("click", ()=>{
 $("#clearAll").addEventListener("click", ()=>{ state.basket=[]; renderBasket(); });
 
 setAccent();
+
+/* 邊打字邊即時搜尋保險：部分手機輸入法（注音）不會即時觸發 input，補上 keyup／輸入結束事件 */
+(function(){
+  var q=document.getElementById("q"); if(!q) return;
+  var last=q.value;
+  ["input"].forEach(function(ev){ q.addEventListener(ev,function(){ last=q.value; }, true); });
+  ["keyup","compositionupdate","compositionend","search"].forEach(function(ev){
+    q.addEventListener(ev,function(){ if(q.value!==last){ last=q.value; q.dispatchEvent(new Event("input",{bubbles:true})); } });
+  });
+})();
 </script>
 </body>
 </html>

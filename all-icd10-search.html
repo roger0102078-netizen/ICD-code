@@ -369,7 +369,7 @@ function passFilter(i){
 }
 
 /* ===== 搜尋與排序 ===== */
-let results = [], shown = 0, curParts = null;
+let results = [], shown = 0, curParts = null, lastQ = null;
 const PAGE = 40;
 
 /* ===== AP／孕 + 週數：置頂孕期診斷碼與 Z3A 週數碼 ===== */
@@ -418,8 +418,9 @@ function pregList(w){
 }
 
 function runSearch(){
-  const q = $q.value;
-  $sb.classList.toggle("hasval", !!q);
+  lastQ = $q.value;
+  const q = $q.value.replace(/[\u3105-\u312F\u31A0-\u31BF\u02C9\u02CA\u02C7\u02CB\u02D9]/g,"");   /* 注音拼字中的符號先略過，已選好的字照常即時搜尋 */
+  $sb.classList.toggle("hasval", !!$q.value);
   const preg = detectPreg(q);
   const parts = preg ? parseQuery(preg.restQuery) : parseQuery(q);
   curParts = parts;
@@ -584,7 +585,12 @@ const $orderDesc=$("orderDesc"), $freqStat=$("freqStat"), $learnStat=$("learnSta
 })();
 
 let debT=null;
-$q.addEventListener("input", ()=>{ clearTimeout(debT); debT=setTimeout(runSearch, 90); });
+function liveSearch(){
+  if($q.value===lastQ) return;            /* 內容沒變（如按方向鍵）就不重搜 */
+  lastQ=$q.value; clearTimeout(debT); debT=setTimeout(runSearch, 20);
+}
+/* 邊打邊搜：input 之外再補 keyup／注音輸入結束／搜尋事件，避免部分手機輸入法不觸發 input */
+["input","keyup","compositionupdate","compositionend","search"].forEach(ev=>$q.addEventListener(ev, liveSearch));
 $("qClear").onclick=()=>{ $q.value=""; runSearch(); $q.focus(); };
 $more.onclick=()=>renderMore(false);
 document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
