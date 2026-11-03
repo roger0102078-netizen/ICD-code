@@ -1,0 +1,411 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>NIHSS 中風量表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 左側逐項評分清單，右側固定總分面板；手機改為底部固定總分列 */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#17212b; --muted:#5b6876; --line:#d8dee5;
+  --accent:#0b6e8a; --accent-soft:#e0f0f4; --on-accent:#ffffff;
+  --sev0:#2e7d4f; --sev1:#5f8f2a; --sev2:#b7791f; --sev3:#c2541b; --sev4:#b3261e;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#18212a; --fg:#e6ecf1; --muted:#97a5b3; --line:#2b3743;
+  --accent:#4fb3cf; --accent-soft:#16323c; --on-accent:#06212a;
+  --sev0:#5cc189; --sev1:#9cc65a; --sev2:#e0a84a; --sev3:#ee8455; --sev4:#f0776d;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#18212a; --fg:#e6ecf1; --muted:#97a5b3; --line:#2b3743;
+  --accent:#4fb3cf; --accent-soft:#16323c; --on-accent:#06212a;
+  --sev0:#5cc189; --sev1:#9cc65a; --sev2:#e0a84a; --sev3:#ee8455; --sev4:#f0776d;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-block:24px 120px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-direction:column;gap:4px;margin-bottom:20px}
+h1{font-size:1.6rem;font-weight:900;margin:0;letter-spacing:.01em;text-wrap:balance}
+h1 small{font-family:var(--f-num);font-size:.8rem;font-weight:500;color:var(--muted);margin-left:8px;letter-spacing:.06em}
+.sub{color:var(--muted);margin:0;font-size:.9rem}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+.items{display:flex;flex-direction:column;gap:12px;min-width:0}
+fieldset.item{border:1px solid var(--line);background:var(--surface);border-radius:10px;margin:0;padding:14px 16px 16px;min-width:0}
+.item legend{display:contents}
+.ihead{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.code{font-family:var(--f-num);font-weight:600;font-size:.85rem;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:5px;flex:none}
+.iname{font-weight:700;font-size:1.02rem}
+.iscore{margin-left:auto;font-family:var(--f-num);font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--muted)}
+.iscore.pos{color:var(--fg)}
+.hint{color:var(--muted);font-size:.84rem;margin:0 0 10px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{position:relative;display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:background .12s,border-color .12s}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .n{flex:none;width:30px;height:26px;display:grid;place-items:center;font-family:var(--f-num);font-weight:600;border-radius:6px;background:var(--bg);font-size:.9rem}
+.opt .t{min-width:0}
+.opt:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+.opt:has(input:checked) .n{background:var(--accent);color:var(--on-accent)}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.limbs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.limbs{grid-template-columns:1fr}}
+.limbs .side{font-weight:700;font-size:.88rem;margin-bottom:6px;color:var(--muted);letter-spacing:.04em}
+
+aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:.78rem;color:var(--muted);letter-spacing:.08em}
+.total{display:flex;align-items:baseline;gap:8px}
+.total b{font-family:var(--f-num);font-size:3.6rem;line-height:1;font-weight:600;font-variant-numeric:tabular-nums}
+.total span{color:var(--muted);font-family:var(--f-num)}
+.sev{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:5px 12px;border-radius:999px;color:var(--sev-c);background:color-mix(in srgb,var(--sev-c) 14%,transparent);align-self:flex-start}
+.sev::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sev-c)}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.scale div{height:6px;border-radius:3px;background:var(--line)}
+.scale div.on{background:var(--sev-c)}
+.scale-l{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;font-family:var(--f-num);font-size:.68rem;color:var(--muted)}
+.breakdown{font-family:var(--f-num);font-size:.8rem;line-height:1.7;color:var(--muted);background:var(--bg);border-radius:8px;padding:10px 12px;word-break:break-all}
+.unnote{font-size:.8rem;color:var(--sev2)}
+.btns{display:flex;gap:8px}
+button{font:inherit;font-weight:700;border-radius:8px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);flex:1}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ref{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:2px}
+.ref .r{display:flex;justify-content:space-between;gap:8px}
+.ref .r span:first-child{font-family:var(--f-num)}
+.coma{border:1px dashed var(--sev3);color:var(--fg);background:color-mix(in srgb,var(--sev3) 8%,transparent);border-radius:8px;padding:10px 12px;font-size:.84rem}
+
+.bar{display:none}
+@media (max-width:860px){
+  aside.panel{position:static}
+  .bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;align-items:center;gap:12px;background:var(--surface);border-top:1px solid var(--line);
+    padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .bar b{font-family:var(--f-num);font-size:1.8rem;font-variant-numeric:tabular-nums}
+  .bar .sev{padding:3px 10px;font-size:.85rem}
+  .bar button{margin-left:auto;padding:7px 12px}
+}
+.maker{margin:2px 0 0;font-weight:700;font-size:.9rem}
+.disclaimer{margin-top:8px;font-size:.82rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--sev2);border-radius:6px;padding:8px 12px;max-width:72ch}
+.disclaimer b{color:var(--fg);margin-right:8px}
+.match{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.match .m{background:var(--accent-soft);border-radius:6px;padding:6px 10px}
+.match .m b{color:var(--accent)}
+.jump{font-size:.84rem;color:var(--accent);font-weight:700;text-decoration:none}
+.jump:hover{text-decoration:underline}
+section.guide,section.sources{margin-top:36px}
+h2{font-size:1.2rem;font-weight:900;margin:0 0 6px;text-wrap:balance}
+.gcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:14px}
+.gc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc.hit{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.gc .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gc .rng{font-family:var(--f-num);font-weight:600;font-size:.85rem;background:var(--bg);padding:2px 8px;border-radius:5px}
+.gc .tag{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.gc .now{margin-left:auto;font-size:.75rem;font-weight:700;color:var(--on-accent);background:var(--accent);padding:2px 8px;border-radius:999px}
+.gc h3{margin:0;font-size:1rem}
+.gc ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.gc .cor{font-family:var(--f-num);font-size:.78rem;color:var(--accent);white-space:nowrap}
+.gc .src{font-size:.76rem;color:var(--muted);margin-top:auto}
+.gc.tnk{margin-top:12px;border-color:var(--accent)}
+.tag.new{color:var(--accent)}
+.tnkgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:760px){.tnkgrid{grid-template-columns:minmax(0,1fr)}}
+.dose{background:var(--bg);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.wtrow{display:flex;align-items:center;gap:8px}
+.wtrow input{font:inherit;font-family:var(--f-num);font-size:1.1rem;width:120px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg)}
+.wtrow input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.dout{font-family:var(--f-num);font-weight:600;font-size:1.05rem;color:var(--muted)}
+.dout.on{color:var(--accent);font-size:1.3rem}
+.dtab{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+.dtab th,.dtab td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.dtab th{color:var(--muted);font-weight:500}
+.dtab tr.on td{background:var(--accent-soft);font-weight:700}
+.dnote{margin:0;font-size:.76rem;color:var(--muted)}
+.sources ol{padding-left:1.4em;display:flex;flex-direction:column;gap:6px;font-size:.86rem;max-width:90ch}
+.sources a{color:var(--accent)}
+.foot{color:var(--muted);font-size:.8rem;margin-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>NIHSS 美國國衛院中風量表<small>NIH STROKE SCALE</small></h1>
+    <p class="sub">依序評估 15 項，記錄病人第一次的反應，勿事後修改或指導病人。總分 0–42 分。</p>
+    <p class="maker">製作：黃弘欣 醫師</p>
+    <div class="disclaimer" role="note"><b>免責聲明</b>本工具僅供醫療專業人員作為評估與教學參考，不能取代臨床判斷。是否施行靜脈血栓溶解或動脈取栓，須綜合發病時間、影像、禁忌症、病人意願與院內流程，由醫師決定。指引內容以台灣腦中風學會公告原文為準，健保給付以健保署最新公告為準。本工具不儲存或傳送任何病人資料。</div>
+  </header>
+
+  <div class="grid">
+    <form class="items" id="form" autocomplete="off"></form>
+
+    <aside class="panel" id="panel" aria-live="polite">
+      <div class="lbl">NIHSS 總分</div>
+      <div class="total"><b id="tot">0</b><span>/ 42</span></div>
+      <div class="sev" id="sev">無中風症狀</div>
+      <div>
+        <div class="scale" id="scale"><div></div><div></div><div></div><div></div><div></div></div>
+        <div class="scale-l"><span>0</span><span>1–4</span><span>5–15</span><span>16–20</span><span>21–42</span></div>
+      </div>
+      <div class="unnote" id="unnote" hidden></div>
+      <div class="breakdown" id="bd"></div>
+      <div class="btns">
+        <button type="button" class="primary" id="copy">複製評分結果</button>
+        <button type="button" id="reset">全部歸零</button>
+      </div>
+      <div class="match" id="match"></div>
+      <a class="jump" href="#guide">查看台灣腦中風學會指引對照 ↓</a>
+      <div class="ref">
+        <div class="r"><span>0</span><span>無中風症狀</span></div>
+        <div class="r"><span>1–4</span><span>輕度中風</span></div>
+        <div class="r"><span>5–15</span><span>中度中風</span></div>
+        <div class="r"><span>16–20</span><span>中重度中風</span></div>
+        <div class="r"><span>21–42</span><span>重度中風</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="guide" id="guide">
+    <h2>台灣腦中風學會指引：NIHSS 分數與治療對照</h2>
+    <p class="sub">以下整理指引中與 NIHSS 分數有關的建議，括號內為建議等級（COR）／證據等級（LOE）。符合目前總分的條目會標示出來。除 NIHSS 外，仍須同時符合時間窗、影像與其他適應症條件。</p>
+    <div class="gcards" id="gcards"></div>
+
+    <article class="gc tnk" id="tnk">
+      <div class="top"><span class="rng">NIHSS 不限分數</span><span class="tag">靜脈溶栓</span><span class="tag new">2026 共識</span></div>
+      <h3>Tenecteplase（TNK）靜脈血栓溶解治療共識</h3>
+      <div class="tnkgrid">
+        <ul>
+          <li>發病 4.5 小時內且無其他靜脈溶栓禁忌症：TNK 0.25 mg/kg（最高 25 mg）可作為選項之一 <span class="cor">(I / A)</span></li>
+          <li>單次靜脈推注（5 秒內），不需持續輸注；配製濃度 5 mg/mL</li>
+          <li>僅能由含 0.9% 生理食鹽水的管路給予，不可與葡萄糖水或其他藥物（含 heparin）混合，推注後以生理食鹽水沖管</li>
+          <li><b>中風劑量與 STEMI（0.5 mg/kg，上限 50 mg）不同，切勿混用</b></li>
+          <li>與 alteplase 相比：功能預後相當或較佳，症狀性腦出血相當（約 2–3%），90 天死亡率無顯著差異；≥ 80 歲結果與 alteplase 相當</li>
+          <li>無專屬逆轉藥物；發生出血時立即停藥，依 2025 指引處置</li>
+          <li>共識未設 NIHSS 納入或排除條件，也未涵蓋 4.5 小時後給藥、橋接取栓與健保給付</li>
+        </ul>
+        <div class="dose">
+          <label for="wt" class="lbl">體重換算（學會修訂劑量表）</label>
+          <div class="wtrow"><input type="number" id="wt" inputmode="decimal" min="20" max="250" step="0.1" placeholder="體重"><span>kg</span></div>
+          <div class="dout" id="dout">輸入體重後顯示劑量</div>
+          <table class="dtab" id="dtab">
+            <thead><tr><th>體重</th><th>劑量</th><th>體積</th></tr></thead>
+            <tbody>
+              <tr data-r="0"><td>&lt; 50 kg</td><td>0.25 mg/kg，上限 12.5 mg</td><td>依體重</td></tr>
+              <tr data-r="1"><td>50–59</td><td>15 mg</td><td>3 mL</td></tr>
+              <tr data-r="2"><td>60–69</td><td>17.5 mg</td><td>3.5 mL</td></tr>
+              <tr data-r="3"><td>70–79</td><td>20 mg</td><td>4 mL</td></tr>
+              <tr data-r="4"><td>80–89</td><td>22.5 mg</td><td>4.5 mL</td></tr>
+              <tr data-r="5"><td>≥ 90</td><td>25 mg（上限）</td><td>5 mL</td></tr>
+            </tbody>
+          </table>
+          <p class="dnote">50–89 kg 各組亦可用體重計算法；&lt; 50 kg 不套用 15 mg 固定劑量。不應因計算體重而延誤給藥。請由第二人複核劑量。</p>
+        </div>
+      </div>
+      <div class="src">出處：2026 急性缺血性腦中風 Tenecteplase 靜脈血栓溶解治療共識</div>
+    </article>
+  </section>
+
+  <section class="sources">
+    <h2>資料來源</h2>
+    <ol>
+      <li>台灣腦中風學會 TNK 共識小組（宋碧姍、孫穆乾、陳柏霖、陳嘉泓、陳龍、湯頌君、黃虹瑜、劉濟弘、蔡力凱、鄭天浚、鄭建興、鍾芷萍）。急性缺血性腦中風 Tenecteplase (TNK) 靜脈血栓溶解治療共識。台灣腦中風學會，2026。doi:10.6318/FJS.2026　<a href="https://www.stroke.org.tw/files/guideline/2026_%E6%80%A5%E6%80%A7%E7%BC%BA%E8%A1%80%E6%80%A7%E8%85%A6%E4%B8%AD%E9%A2%A8Tenecteplase%E9%9D%9C%E8%84%88%E8%A1%80%E6%A0%93%E6%BA%B6%E8%A7%A3%E6%B2%BB%E7%99%82%E5%85%B1%E8%AD%98.pdf" target="_blank" rel="noopener">全文 PDF</a></li>
+      <li>Wang CM, Hsieh MT, Chen CH, et al.；台灣腦中風學會指引共識小組。2025 台灣腦中風學會急性缺血性腦中風靜脈血栓溶解治療指引更新。<i>台灣中風醫誌</i> 2025;7(1):1–57. doi:10.6318/FJS.202503_7(1).0001　<a href="https://www.stroke.org.tw/files/guideline/2025_2.V7%281%29-1-57.pdf" target="_blank" rel="noopener">全文 PDF</a></li>
+      <li>林浚仁、紀乃方、陳仕軒等，台灣腦中風學會指引共識小組。2023 台灣腦中風學會急性缺血中風動脈內血栓移除治療指引更新。<i>台灣中風醫誌</i> 2023;5(3):151–172. doi:10.6318/FJS.202309_5(3).0001　<a href="https://www.stroke.org.tw/files/guideline/2023_678796165-2-V5-3-151-172.pdf" target="_blank" rel="noopener">全文 PDF</a></li>
+      <li>Tang SC, Tsai LK, Chen CJ, et al.2019 台灣腦中風學會急性缺血中風動脈內血栓移除治療指引。<i>台灣中風醫誌</i> 2019;1(2):77–89. doi:10.6318/FJS.201909_1(2).0001　<a href="https://www.stroke.org.tw/files/guideline/2019_%E6%80%A5%E6%80%A7%E7%BC%BA%E8%A1%80%E4%B8%AD%E9%A2%A8%E5%8B%95%E8%84%88%E5%85%A7%E8%A1%80%E6%A0%93%E7%A7%BB%E9%99%A4%E6%B2%BB%E7%99%82%E6%8C%87%E5%BC%952019.pdf" target="_blank" rel="noopener">全文 PDF</a></li>
+      <li>Hsieh MJ, Chen YJ, Tang SC, et al. 2020 Guideline for Prehospital Management, Emergency Evaluation and Treatment of Patients With Acute Ischemic Stroke (Taiwan Society of Emergency Medicine &amp; Taiwan Stroke Society). <i>J Acute Med</i> 2021;11(1):12–17. doi:10.6705/j.jacme.202103_11(1).0002</li>
+      <li>NIHSS 評分項目與說明：National Institute of Neurological Disorders and Stroke (NINDS), NIH Stroke Scale。</li>
+      <li>台灣腦中風學會治療指引總覽：<a href="https://www.stroke.org.tw/guideline/" target="_blank" rel="noopener">www.stroke.org.tw/guideline</a></li>
+    </ol>
+    <p class="foot">製作：黃弘欣 醫師　·　指引內容整理日期：2026 年 11 月</p>
+  </section>
+</div>
+
+<div class="bar" aria-hidden="true">
+  <b id="tot2">0</b><span class="sev" id="sev2">無中風症狀</span>
+  <button type="button" id="copy2">複製</button>
+</div>
+
+<script>
+const UN = "UN";
+const ITEMS = [
+  {id:"1a",name:"意識程度",hint:"即使有插管、語言障礙或外傷，仍須選擇一個分數。",opts:[
+    [0,"清醒，反應敏銳"],[1,"嗜睡，輕微刺激即可喚醒並回答、遵從指令"],[2,"昏睡或反應遲鈍，需反覆或強烈（疼痛）刺激才有反應"],[3,"昏迷，僅有反射動作或完全無反應"]]},
+  {id:"1b",name:"意識程度：問題",hint:"詢問「現在是幾月？」及「你幾歲？」，須完全正確，不給部分分數。插管或構音障礙無法說話者記 1 分；失語或昏迷者記 2 分。",opts:[
+    [0,"兩題皆答對"],[1,"答對一題"],[2,"兩題皆答錯"]]},
+  {id:"1c",name:"意識程度：指令",hint:"請病人「睜眼、閉眼」及以健側手「握拳、放開」。可用示範動作。",opts:[
+    [0,"兩項皆正確執行"],[1,"正確執行一項"],[2,"兩項皆無法執行"]]},
+  {id:"2",name:"最佳凝視",hint:"只測水平眼球運動，可用眼頭反射。",opts:[
+    [0,"正常"],[1,"部分凝視麻痺（單眼或雙眼凝視異常，但無強迫性偏視）"],[2,"強迫性偏視，或眼頭反射無法克服的完全凝視麻痺"]]},
+  {id:"3",name:"視野",hint:"以對面法檢查上下象限，可用數指或視覺威脅。",opts:[
+    [0,"無視野缺損"],[1,"部分偏盲"],[2,"完全偏盲"],[3,"雙側偏盲（含皮質盲）"]]},
+  {id:"4",name:"顏面麻痺",hint:"請病人露齒、揚眉、閉眼，反應差者可用疼痛刺激觀察表情。",opts:[
+    [0,"正常，兩側對稱"],[1,"輕微麻痺（鼻唇溝變平、笑時不對稱）"],[2,"部分麻痺（下半臉完全或接近完全麻痺）"],[3,"完全麻痺（單側或雙側上下半臉皆無動作）"]]},
+  {limb:true,id:"5",name:"上肢運動",hint:"手臂伸直，坐姿舉 90°、躺姿舉 45°，手掌朝下，維持 10 秒。",sides:[["5a","左上肢"],["5b","右上肢"]],opts:[
+    [0,"無飄移，維持 10 秒"],[1,"10 秒內飄移下垂，但未碰到床面"],[2,"可稍微對抗重力，但 10 秒內碰到床面"],[3,"無法對抗重力，直接掉落"],[4,"完全無動作"],[UN,"截肢或關節融合（不計分）"]]},
+  {limb:true,id:"6",name:"下肢運動",hint:"躺姿抬腿 30°，維持 5 秒。",sides:[["6a","左下肢"],["6b","右下肢"]],opts:[
+    [0,"無飄移，維持 5 秒"],[1,"5 秒內飄移下垂，但未碰到床面"],[2,"可稍微對抗重力，但 5 秒內碰到床面"],[3,"無法對抗重力，直接掉落"],[4,"完全無動作"],[UN,"截肢或關節融合（不計分）"]]},
+  {id:"7",name:"肢體運動失調",hint:"指鼻試驗與跟膝脛試驗，雙側皆測。失調程度需超過肌力無力所能解釋才給分；癱瘓或無法理解者記 0 分。",opts:[
+    [0,"無運動失調"],[1,"一側肢體有失調"],[2,"兩側肢體皆有失調"],[UN,"截肢或關節融合（不計分）"]]},
+  {id:"8",name:"感覺",hint:"以針刺測試臉、手臂、軀幹、腿，比較兩側。昏迷者記 2 分。",opts:[
+    [0,"正常，無感覺喪失"],[1,"輕至中度感覺喪失（針刺感覺較鈍，但知道被碰觸）"],[2,"重度至完全感覺喪失"]]},
+  {id:"9",name:"最佳語言",hint:"請病人描述圖片、說出物品名稱、讀句子。插管者可用書寫。昏迷者記 3 分。",opts:[
+    [0,"無失語，正常"],[1,"輕至中度失語（流暢度或理解力下降，但仍可溝通）"],[2,"嚴重失語（片段式表達，檢查者難以理解）"],[3,"全失語或無法言語"]]},
+  {id:"10",name:"構音障礙",hint:"請病人朗讀或複誦字詞，評估清晰度。",opts:[
+    [0,"正常"],[1,"輕至中度，部分字詞含糊但可理解"],[2,"嚴重，無法理解或無法言語"],[UN,"插管或其他物理性障礙（不計分）"]]},
+  {id:"11",name:"忽略／不注意",hint:"評估視覺、觸覺、聽覺、空間或自身的忽略，可用雙側同時刺激。",opts:[
+    [0,"無異常"],[1,"單一感覺模態不注意，或雙側同時刺激時一側消失"],[2,"嚴重偏側忽略，或超過一種感覺模態不注意"]]}
+];
+
+// 欄位清單（含左右兩側）
+const FIELDS = [];
+const form = document.getElementById("form");
+
+function optList(fid, opts){
+  return `<div class="opts">${opts.map(([v,t])=>`
+    <label class="opt"><input type="radio" name="f${fid}" id="f${fid}_${v}" value="${v}"${v===0?" checked":""}>
+    <span class="n">${v}</span><span class="t">${t}</span></label>`).join("")}</div>`;
+}
+
+form.innerHTML = ITEMS.map(it=>{
+  if(it.limb){
+    it.sides.forEach(([fid,side])=>FIELDS.push({fid,label:side}));
+    return `<fieldset class="item"><legend><div class="ihead"><span class="code">${it.sides.map(s=>s[0]).join("/")}</span>
+      <span class="iname">${it.name}</span><span class="iscore" data-for="${it.id}">0</span></div></legend>
+      <p class="hint">${it.hint}</p>
+      <div class="limbs">${it.sides.map(([fid,side])=>`<div><div class="side">${fid}｜${side}</div>${optList(fid,it.opts)}</div>`).join("")}</div>
+    </fieldset>`;
+  }
+  FIELDS.push({fid:it.id,label:it.name});
+  return `<fieldset class="item"><legend><div class="ihead"><span class="code">${it.id}</span>
+    <span class="iname">${it.name}</span><span class="iscore" data-for="${it.id}">0</span></div></legend>
+    <p class="hint">${it.hint}</p>${optList(it.id,it.opts)}</fieldset>`;
+}).join("");
+
+const SEV = [
+  {max:0,label:"無中風症狀",c:"--sev0"},
+  {max:4,label:"輕度中風",c:"--sev1"},
+  {max:15,label:"中度中風",c:"--sev2"},
+  {max:20,label:"中重度中風",c:"--sev3"},
+  {max:42,label:"重度中風",c:"--sev4"}
+];
+
+function val(fid){
+  const el = form.querySelector(`input[name="f${fid}"]:checked`);
+  return el ? el.value : "0";
+}
+function num(v){ return v===UN ? 0 : Number(v); }
+
+const C = s=>`<span class="cor">(${s})</span>`;
+const GUIDE = [
+  {min:0,max:5,tag:"靜脈溶栓",title:"輕微中風（NIHSS 0–5）",src:"2025 靜脈血栓溶解指引",b:[
+    `有失能症狀（如視野缺損、嚴重失語、忽略、肢體無法抗重力，或影響日常生活）：建議 4.5 小時內施打靜脈血栓溶解 ${C("IIa / A")}`,
+    `無失能症狀：優先考慮口服抗血栓藥物及血壓、血糖控制等最佳內科治療；是否施打由醫師評估利弊 ${C("IIa / B-R")}`,
+    `非失能輕微中風參考定義（ARAMIS）：總分 0–5、各單項 ≤1 分、意識項目 0 分`]},
+  {min:0,max:42,tag:"靜脈溶栓",title:"發病 4.5 小時內靜脈血栓溶解",src:"2025 靜脈血栓溶解指引",b:[
+    `符合規範者建議施打 alteplase，建議條文本身未設 NIHSS 門檻 ${C("I / A")}`,
+    `Alteplase 0.9 mg/kg 為標準劑量 ${C("I / A")}；0.6 mg/kg 未證實不劣於標準劑量，有特殊考量時可考慮 ${C("IIb / B-R")}`,
+    `Tenecteplase 0.25 mg/kg（上限 25 mg）可作為選項 ${C("I / A")}，劑量換算見下方 TNK 共識；0.4 mg/kg 不建議 ${C("III / B-R")}`,
+    `預計接受動脈取栓者，符合條件仍應儘速施打（橋接治療）${C("I / A")}`]},
+  {min:26,max:42,tag:"靜脈溶栓",title:"嚴重中風（NIHSS > 25）",src:"2025 靜脈血栓溶解指引",b:[
+    `臨床嚴重但影像未顯示嚴重程度：發病 3 小時內可施打 ${C("I / A")}；3–4.5 小時 ${C("IIb / C")}`]},
+  {min:6,max:42,tag:"動脈取栓",title:"前循環大血管阻塞，發病 0–6 小時",src:"2019 動脈內血栓移除指引",b:[
+    `年齡 ≥18、中風前 mRS ≤1、NIHSS ≥6、ICA 或 MCA M1 阻塞、ASPECTS ≥6、6 小時內開始治療：應積極評估取栓 ${C("I / A")}`,
+    `臨床條件相同但阻塞在 MCA M2/M3：可評估 ${C("IIb / B-R")}；ACA、PCA、VA、BA：可評估 ${C("IIb / C-EO")}`]},
+  {min:6,max:42,tag:"動脈取栓",title:"前循環，發病 6–24 小時（DAWN／DEFUSE 3）",src:"2023 動脈內血栓移除指引更新",b:[
+    `ICA 或 M1 阻塞且符合 DEFUSE 3 或 DAWN 條件，可進行取栓 ${C("I / A")}`,
+    `DAWN 條件：≥80 歲 NIHSS ≥10 且核心 ≤20 mL；<80 歲 NIHSS ≥10 且核心 ≤30 mL，或 NIHSS ≥20 且核心 30–50 mL（DEFUSE 3 以灌流影像篩選，NIHSS ≥6）`,
+    `大範圍梗塞（ASPECTS 3–5 或核心 50–100 mL、無腫塊效應）可考慮 ${C("IIb / B-R")}`]},
+  {min:6,max:42,tag:"動脈取栓",title:"後循環：基底動脈阻塞",src:"2023 動脈內血栓移除指引更新",b:[
+    `發病 12 小時內、符合 ATTENTION 或 BAOCHE 條件、NIHSS ≥10：建議取栓 ${C("I / A")}`,
+    `發病 12–24 小時、符合 BAOCHE 條件、NIHSS ≥6、PC-ASPECTS ≥6：取栓是合理的 ${C("IIb / B-R")}`]},
+  {min:8,max:30,tag:"健保給付",title:"健保動脈取栓給付範圍",src:"2019 動脈內血栓移除指引背景說明",b:[
+    `指引提及健保自 2018 年起給付取栓限 NIHSS 8–30 分；此為給付範圍，非醫療建議，請以健保署最新公告為準`]}
+];
+const gwrap = document.getElementById("gcards");
+function renderGuide(total, aramis){
+  gwrap.innerHTML = GUIDE.map(g=>{
+    const hit = total>=g.min && total<=g.max;
+    const rng = g.min===0&&g.max===42 ? "不限分數" : g.max===42 ? `≥ ${g.min}` : `${g.min}–${g.max}`;
+    return `<article class="gc${hit?" hit":""}"><div class="top"><span class="rng">NIHSS ${rng}</span><span class="tag">${g.tag}</span>${hit?'<span class="now">符合目前分數</span>':""}</div>
+      <h3>${g.title}</h3><ul>${g.b.map(x=>`<li>${x}</li>`).join("")}</ul><div class="src">出處：${g.src}</div></article>`;
+  }).join("");
+  const m = [];
+  if(total<=5){
+    m.push(aramis ? `<div class="m"><b>分數符合非失能輕微中風定義</b>（ARAMIS 分數條件），仍須臨床判斷是否有失能症狀。</div>`
+                  : `<div class="m"><b>輕微中風但有單項 ≥2 或意識項目異常</b>，需評估是否屬失能性輕微中風。</div>`);
+  }
+  if(total>=6) m.push(`<div class="m"><b>NIHSS ≥6</b>：若為大血管阻塞，達前循環 6 小時內取栓評估門檻。</div>`);
+  if(total>=10) m.push(`<div class="m"><b>NIHSS ≥10</b>：達 DAWN 與基底動脈阻塞（12 小時內）的分數條件。</div>`);
+  if(total>25) m.push(`<div class="m"><b>NIHSS >25</b>：屬嚴重中風，溶栓建議依發病時間與影像而定。</div>`);
+  document.getElementById("match").innerHTML = m.join("");
+}
+
+let lastText = "";
+function update(){
+  let total = 0; const parts = []; const uns = [];
+  FIELDS.forEach(({fid,label})=>{
+    const v = val(fid); total += num(v);
+    parts.push(`${fid}:${v}`);
+    if(v===UN) uns.push(`${fid} ${label}`);
+  });
+  // 各題分數標籤
+  ITEMS.forEach(it=>{
+    const el = form.querySelector(`[data-for="${it.id}"]`);
+    let s;
+    if(it.limb){ s = it.sides.map(([f])=>val(f)).join(" / "); el.classList.toggle("pos", it.sides.some(([f])=>num(val(f))>0)); }
+    else { s = val(it.id); el.classList.toggle("pos", num(s)>0); }
+    el.textContent = s;
+  });
+  const idx = SEV.findIndex(s=>total<=s.max);
+  const sv = SEV[idx];
+  document.documentElement.style.setProperty("--sev-c", `var(${sv.c})`);
+  document.querySelectorAll("#sev,#sev2").forEach(e=>{e.textContent=sv.label; e.style.setProperty("--sev-c",`var(${sv.c})`)});
+  document.getElementById("tot").textContent = total;
+  document.getElementById("tot2").textContent = total;
+  document.querySelectorAll("#scale div").forEach((d,i)=>d.classList.toggle("on", i===idx));
+  document.getElementById("bd").textContent = parts.join("  ");
+  const un = document.getElementById("unnote");
+  un.hidden = uns.length===0;
+  un.textContent = uns.length ? `無法評估（UN，不計分）：${uns.join("、")}` : "";
+  const aramis = total<=5 && FIELDS.every(({fid})=>num(val(fid))<=1) && ["1a","1b","1c"].every(f=>num(val(f))===0);
+  renderGuide(total, aramis);
+  lastText = `NIHSS 總分 ${total}（${sv.label}）\n` + parts.join(", ") + (uns.length?`\nUN：${uns.join("、")}`:"");
+}
+form.addEventListener("change", update);
+
+async function copy(btn){
+  const old = btn.textContent;
+  try{ await navigator.clipboard.writeText(lastText); btn.textContent="已複製"; }
+  catch(e){
+    const r=document.createRange(); r.selectNodeContents(document.getElementById("bd"));
+    const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+    btn.textContent="請按 Ctrl+C 複製";
+  }
+  setTimeout(()=>btn.textContent=old,1600);
+}
+document.getElementById("copy").addEventListener("click",e=>copy(e.currentTarget));
+document.getElementById("copy2").addEventListener("click",e=>copy(e.currentTarget));
+document.getElementById("reset").addEventListener("click",()=>{
+  form.querySelectorAll('input[value="0"]').forEach(i=>i.checked=true); update();
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+update();
+
+const wt=document.getElementById("wt"), dout=document.getElementById("dout");
+wt.addEventListener("input",()=>{
+  const w=parseFloat(wt.value);
+  document.querySelectorAll("#dtab tr[data-r]").forEach(t=>t.classList.remove("on"));
+  if(!(w>0)){dout.textContent="輸入體重後顯示劑量";dout.classList.remove("on");return;}
+  let r,mg;
+  if(w<50){r=0;mg=Math.min(12.5,Math.round(w*0.25*10)/10);}
+  else if(w<60){r=1;mg=15}else if(w<70){r=2;mg=17.5}else if(w<80){r=3;mg=20}else if(w<90){r=4;mg=22.5}else{r=5;mg=25}
+  document.querySelector(`#dtab tr[data-r="${r}"]`).classList.add("on");
+  dout.textContent=`TNK ${mg} mg＝${Math.round(mg/5*100)/100} mL`;
+  dout.classList.add("on");
+});
+</script>
+
+</body></html>
