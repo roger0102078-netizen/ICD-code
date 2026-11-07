@@ -50,6 +50,7 @@ input,textarea,select{font:inherit;color:var(--ink);background:var(--panel);bord
 .nlrows{display:grid;grid-template-columns:minmax(90px,max-content) minmax(0,1fr);gap:4px 14px;margin:0}
 .nlrows dt{color:var(--mute);font-size:12px;font-weight:700;padding-top:2px}
 .nlrows dd{margin:0}
+.cntbox{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--bg)}
 .oin{width:100%;max-width:420px;margin-top:6px}
 .chip.pk{border-style:dashed;border-color:var(--accent);color:var(--accent)}
 .wrap{display:grid;grid-template-columns:170px minmax(0,1fr) 390px;gap:16px;padding:16px;align-items:start}
@@ -344,7 +345,7 @@ const regPrio=()=>{const r=S.tr.cc.map(c=>TRMAP[c]).filter(Boolean);return r.len
 const PRE={nt:{lvl:null,mode:'',cc0:[]},tr:{lvl:null,mode:'',cc0:[]},pd:{lvl:null,mode:'',cc0:[]}};
 const blankHpi=()=>({on:'',unit:'小時',course:'',nrs:null,loc:[],side:'',q:[],sym:{},ext:{},note:''});
 const S={mode:'nt',tri:{...PRE.nt},
- oth:{},nl:'',nlres:null,pt:{age:'',unit:'歲',sex:'',wt:''},pd:{age:'',unit:'歲',sex:'',wt:'',ga:'',vax:'',dev:'',feed:'',care:''},cc:[],
+ oth:{},cnt:{},nl:'',nlres:null,pt:{age:'',unit:'歲',sex:'',wt:''},pd:{age:'',unit:'歲',sex:'',wt:'',ga:'',vax:'',dev:'',feed:'',care:''},cc:[],
  hpi:blankHpi(),pmh:[],alg:[],soc:[],surg:'',pe:{},dx:[],
  tr:{cc:[],time:'',when:'',loc:'',alc:'',moi:[],det:{},ems:[],abc:{},gcs:{e:'',v:'',m:''},reg:{},meal:'',teta:'',dx:[]}};
 const gset=t=>['e','v','m'].every(k=>t.gcs[k]!=='');
@@ -423,8 +424,8 @@ const pi=()=>isPd()?S.pd:S.pt,pk=()=>isPd()?'pd':'pt';
 const TPLS=()=>isPd()?PTPL:TPL,SYSX=()=>isPd()?PSYS:SYS,PMHX=()=>isPd()?PPMH:PMH,DXM=()=>isPd()?DXPD:DXNT;
 const ageMonths=()=>{const a=S.pd.age;if(a===''||a==null||isNaN(+a))return null;const n=+a;return S.pd.unit==='天'?n/30:S.pd.unit==='月'?n:n*12};
 /* 成人非外傷與小兒各自保存一份病歷內容，切換類型時互換（外傷沿用成人那一份的病史與過敏） */
-const PK=['cc','hpi','pe','dx','pmh','alg','soc','surg','oth'],sideOf=m=>m==='pd'?'pd':'nt';
-const SAVED={pd:{cc:[],hpi:blankHpi(),pe:{},dx:[],pmh:[],alg:[],soc:[],surg:'',oth:{}}};
+const PK=['cc','cnt','hpi','pe','dx','pmh','alg','soc','surg','oth'],sideOf=m=>m==='pd'?'pd':'nt';
+const SAVED={pd:{cc:[],cnt:{},hpi:blankHpi(),pe:{},dx:[],pmh:[],alg:[],soc:[],surg:'',oth:{}}};
 const dxl=()=>isTr()?S.tr.dx:S.dx;
 
 /* ---------- 範本查詢 ---------- */
@@ -471,6 +472,7 @@ function buildNt(){
   <div class="f"><label>醫師確認主訴（可複選，第一項為主要主訴；選項依主訴自動帶出）</label>
    ${cats.map(k=>`<div class="grp">${k}</div><div class="chips">${TPLS().filter(t=>t.cat===k).map(t=>cm('cc',t.n)).join('')}</div>`).join('')}
    <div class="grp">其他</div>${CH('cc','')}</div>
+  ${S.cc.length?`<div class="f"><label>主訴次數（選填，例如嘔吐 3 次）</label><div class="row">${S.cc.map(c=>`<label class="cntbox"><span>${esc(c)}</span><input type="number" min="0" inputmode="numeric" data-i="cnt.${esc(c)}" value="${esc(S.cnt[c]??'')}" style="width:70px"><span>次</span></label>`).join('')}</div></div>`:''}
  </section>
  <section class="card" id="s-hpi"><h2>② 現在病史 <small>${esc(S.cc.join('、'))}</small></h2>
   ${S.cc.some(c=>PACK[c])?`<div class="f"><label>快速組合（點一下帶入常見情境，再逐項修改；Alt+P 套用第一個）</label><div class="chips">${S.cc.flatMap(c=>(PACK[c]||[]).map((p,i)=>`<button type="button" class="chip pk" data-act="pack" data-pk="${esc(c)}" data-i="${i}">${esc(p[0])}</button>`)).join('')}</div></div>`:''}
@@ -539,7 +541,7 @@ function fkey(el){if(!el||el===document.body||!$('#form').contains(el))return nu
 function rebuild(){const y=scrollY,k=fkey(document.activeElement);
  $('#form').innerHTML=isTr()?buildTr():buildNt();$('#dxlist').innerHTML=Object.keys(isTr()?DXTR:DXM()).map(k=>`<option value="${esc(k)}">`).join('');scrollTo(0,y);
  if(k){try{$('#form').querySelector(k)?.focus({preventScroll:true})}catch(e){}}}
-function prune(){const sy=uni('sym'),lo=uni('loc'),qs=uni('q');
+function prune(){Object.keys(S.cnt).forEach(k=>{if(!S.cc.includes(k))delete S.cnt[k]});const sy=uni('sym'),lo=uni('loc'),qs=uni('q');
  Object.keys(S.hpi.sym).forEach(k=>{if(!sy.includes(k))delete S.hpi.sym[k]});S.hpi.loc=S.hpi.loc.filter(x=>lo.includes(x));S.hpi.q=S.hpi.q.filter(x=>qs.includes(x));
  const ex=uniExt().map(e=>e[0]);Object.keys(S.hpi.ext).forEach(k=>{if(!ex.includes(k))delete S.hpi.ext[k]});if(!cur().some(t=>t.side))S.hpi.side='';
  const keep=new Set(prio());Object.keys(S.pe).forEach(k=>{if(!S.pe[k]?.st)delete S.pe[k]})}
@@ -709,6 +711,7 @@ function sectionsList(){const L=[],en=LANG!=='zh',cm_=en?', ':'、',JN=a=>a.map(
    病歷預覽：把結構化資料寫成文法完整的英文敘述（標題維持中文）。
    純中文模式仍使用上面的條列版 sectionsList。
    ===================================================================== */
+const cntTxt=n=>{const c=S.cnt[n];return c!==undefined&&c!==''&&c!==null?` (${c} ${+c===1?'time':'times'})`:''};
 const lcF=s=>s?s.charAt(0).toLowerCase()+s.slice(1):s;
 const ucF=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
 const andJ=a=>a.length<=1?(a[0]||''):a.length===2?a[0]+' and '+a[1]:a.slice(0,-1).join(', ')+', and '+a[a.length-1];
@@ -749,7 +752,7 @@ function sectionsProse(){
  const diag=()=>{const d=dxl();if(!d.length)return '';const f=x=>vv(x[0])+(x[1]?` (${x[1]})`:'');return `The primary diagnosis is ${lcF(f(d[0]))}.`+(d.length>1?` Additional diagnoses include ${andJ(d.slice(1).map(f).map(lcF))}.`:'')};
  if(!isTr()){
   const h=S.hpi,sym=Object.entries(h.sym),pos=[...sym.filter(x=>x[1]==1).map(x=>vv(x[0])),...(S.oth['hpi.sym']?[S.oth['hpi.sym']]:[])],neg=sym.filter(x=>x[1]==-1).map(x=>vv(x[0]));
-  const ccs=LL('cc',S.cc).map(vv),loc=LL('hpi.loc',h.loc).map(vv),q=LL('hpi.q',h.q).map(vv),course=J('hpi.course',h.course),side=J('hpi.side',h.side);
+  const ccs=[...S.cc.map(n=>vv(n)+cntTxt(n)),...(S.oth.cc?[S.oth.cc]:[])],loc=LL('hpi.loc',h.loc).map(vv),q=LL('hpi.q',h.q).map(vv),course=J('hpi.course',h.course),side=J('hpi.side',h.side);
   const pain=(uni('loc').length||uni('q').length)&&h.nrs!=null,on=h.on?`${h.on} ${UNITEN[h.unit]||vv(h.unit)} ago`:'';
   Hp(Z('主訴 CC','Chief complaint (CC)'),ccLine(ccs.map((x,i)=>i?lcF(x):ucF(x))));
   const ex=uniExt().map(e=>[e[0],e[1]==='sel'?J('hpi.ext.'+e[0],h.ext[e[0]]):h.ext[e[0]]]).filter(x=>x[1]);
@@ -829,7 +832,7 @@ function json(){const n=num;
  const dx=dxl().map((d,i)=>({name:d[0],icd10:d[1]||null,primary:i===0}));
  const out=o=>JSON.stringify(LANG!=='zh'?deepT(o):o,null,1);
  if(!isTr()){const h=S.hpi;return out({chart_type:isPd()?'pediatric':'non_trauma',patient:{age:{value:n(pi().age),unit:pi().unit},sex:pi().sex||null,weight_kg:n(pi().wt)},triage:{ttas_level:S.tri.lvl,arrival_mode:S.tri.mode},
-  chief_complaint:S.cc.map((c,i)=>({text:c,icd10:TP[c]?.icd,primary:i===0})),
+  chief_complaint:S.cc.map((c,i)=>({text:c,icd10:TP[c]?.icd,primary:i===0,episode_count:S.cnt[c]!==undefined&&S.cnt[c]!==''?+S.cnt[c]:null})),
   hpi:{onset:{value:n(h.on),unit:h.unit,relative:'ago'},course:h.course,location:h.loc,laterality:h.side||null,pain_nrs:h.nrs,quality:h.q,
    symptoms_present:Object.keys(h.sym).filter(k=>h.sym[k]==1),symptoms_denied:Object.keys(h.sym).filter(k=>h.sym[k]==-1),extra:h.ext,free_text:h.note||null},
   history:{pmh:S.pmh,allergies:S.alg,social:S.soc,surgical:S.surg||null,...(isPd()?{birth_history:S.pd.ga||null,immunization:S.pd.vax||null,development:S.pd.dev||null,feeding:S.pd.feed||null,childcare:S.pd.care||null}:{})},physical_exam:reg(S.pe),diagnoses:dx,other_entries:oe()})}
@@ -916,7 +919,7 @@ const relTime=t=>{let m=t.match(/(?:約|大約)?\s*(\d+(?:\.\d+)?|半)\s*(分鐘
  m=t.match(/(\d+(?:\.\d+)?|half an?)\s*(minutes?|mins?|hours?|hrs?|h|days?)\s+ago/i);
  if(m){const n=/half/i.test(m[1])?0.5:+m[1],u=/^d/i.test(m[2])?'天':/^h/i.test(m[2])?'小時':'分鐘';return {n,unit:u,mins:u==='天'?n*1440:u==='小時'?n*60:n,raw:m[0]}}
  return null};
-const emptyNt=()=>({chart:'nt',pd:null,cc:[],onset:null,course:'',nrs:null,loc:[],side:'',q:[],sym_present:[],sym_denied:[],ext:{},pmh:[],alg:[],soc:[],surg:'',pe:{},dx:[],oth:{},note:''});
+const emptyNt=()=>({chart:'nt',pd:null,cnt:{},cc:[],onset:null,course:'',nrs:null,loc:[],side:'',q:[],sym_present:[],sym_denied:[],ext:{},pmh:[],alg:[],soc:[],surg:'',pe:{},dx:[],oth:{},note:''});
 const emptyTr=()=>({chart:'tr',pd:null,cc:[],time:'',when:'',moi:[],det:{},loc:'',alc:'',ems:[],abc:{},gcs:null,reg:{},pmh:[],alg:[],meal:'',teta:'',dx:[],oth:{},note:''});
 
 function ruleBg(t,r,pmhList,algList){
@@ -942,6 +945,12 @@ function parsePd(t){const p={};let m;
  if(/純母乳|breast-?fed|exclusively breast/i.test(t))p.feed='純母乳';else if(/配方奶|formula/i.test(t))p.feed='配方奶';
  if(/托嬰|幼兒園|daycare|day care|preschool/i.test(t))p.care='托嬰中心/幼兒園';
  return Object.keys(p).length?p:null}
+const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+const numNorm=t=>t.replace(/\btwice\b/gi,'2 times').replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/gi,m=>NUMW[m.toLowerCase()]).replace(/([一二兩三四五六七八九十])\s*(?=次|回)/g,(m,c)=>({一:1,二:2,兩:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9,十:10})[c]);
+function countFor(t,terms){const esc=s=>s.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&');
+ for(const w of terms){if(!w)continue;const base=/^[\x00-\x7f]+$/.test(w)&&w.length>5?w.replace(/(ing|ed|s)$/i,''):w,W=esc(base),SEP='[^,，。.;；\\n]';
+  const m=new RegExp(W+SEP+'{0,14}?(\\d+)\\s*(?:次|回|times?|x\\b|episodes?|bouts?)','i').exec(t)||new RegExp('(\\d+)\\s*(?:次|回|times?|episodes?|bouts?)\\s*(?:of\\s*)?'+SEP+'{0,8}'+W,'i').exec(t)||new RegExp(W+'\\w*\\s*(?:x|×)\\s*(\\d+)','i').exec(t)||new RegExp('(?:x|×)\\s*(\\d+)\\s*'+W,'i').exec(t);
+  if(m)return m[1]}return ''}
 function ruleNt(t){
  const r=emptyNt(),body=bodyOf(t),cands=[];
  const bl=body.toLowerCase();
@@ -949,6 +958,8 @@ function ruleNt(t){
  cands.forEach(x=>{x.k=(body.slice(0,x.i).match(/[，,。\n]/g)||[]).length});const k0=Math.min(...cands.map(x=>x.k));
  let c=cands.filter(x=>x.k===k0&&!x.acc).sort((a,b)=>a.i-b.i);if(!c.length)c=cands.slice().sort((a,b)=>a.i-b.i);
  r.cc=c.slice(0,2).map(x=>x.n);if(r.cc.includes('小兒發燒'))r.cc=r.cc.filter(x=>x!=='發燒');
+ {const tn=numNorm(t),tm=n=>[...(CCAL[n]||n.split('/').map(strip)),...(CCEN[n]||[]),...(enOf(n)?[enOf(n)]:[])];r.cc.forEach(n=>{const v=countFor(tn,tm(n));if(v)r.cnt[n]=v});
+  TPLS().forEach(x=>{if(r.cc.length<3&&!r.cc.includes(x.n)){const v=countFor(tn,tm(x.n));if(v){r.cc.push(x.n);r.cnt[x.n]=v}}})}
  const ccs=r.cc.length?r.cc:S.cc,lo=uniFor(ccs,'loc'),qs=uniFor(ccs,'q'),sy=uniFor(ccs,'sym');
  const rt=relTime(t);if(rt)r.onset=rt.n===0.5&&rt.unit==='小時'?{value:30,unit:'分鐘'}:{value:rt.n,unit:rt.unit};
  const wk=t.match(/(\d+)\s*(?:週|周)前/);if(wk)r.onset={value:+wk[1],unit:'週'};
@@ -1099,10 +1110,10 @@ function aiPrompt(text){
  if(!tr)return `${rules}
 
 輸出格式（省略沒提到的欄位）：
-{"cc":["主訴"],"cc_other":"","onset":{"value":2,"unit":"分鐘|小時|天|週"},"course":"加重|持平|改善|間歇","nrs":7,"loc":[],"loc_other":"","side":"左|右|雙側|正中","q":[],"q_other":"",
+{"cc":["主訴"],"cnt":{"主訴名稱":3},"cc_other":"","onset":{"value":2,"unit":"分鐘|小時|天|週"},"course":"加重|持平|改善|間歇","nrs":7,"loc":[],"loc_other":"","side":"左|右|雙側|正中","q":[],"q_other":"",
 "sym_present":[],"sym_denied":[],"sym_other":"","ext":{"專屬欄位名稱":"值"},"pmh":[],"pmh_other":"","alg":[],"alg_other":"","soc":[],"surg":"",${isPd()?'"pd":{"age":{"value":2,"unit":"天|月|歲"},"sex":"男|女","wt":"體重公斤數字","ga":"","vax":"","dev":"","feed":"","care":""},':'"pd":{"age":{"value":45,"unit":"天|月|歲"},"sex":"男|女","wt":"體重公斤數字"},'}
 "pe":{"系統名稱":{"status":"n 表示文字明確說正常，a 表示異常","findings":[],"other":""}},"dx":[],"note":"其他沒有對應欄位的重要內容"}
-說明：cc 取自「主訴」的名稱；loc、q、sym_* 要取自該主訴底下的選項；否認的症狀放 sym_denied。
+說明：cnt 是該主訴反覆發生的次數（例如嘔吐 3 次），沒提到就省略；cc 取自「主訴」的名稱；loc、q、sym_* 要取自該主訴底下的選項；否認的症狀放 sym_denied。
 
 選項字典：
 ${dictNt()}
@@ -1127,6 +1138,7 @@ ${text}`}
 function normNt(raw){
  const r=emptyNt(),O=(p,t)=>addTo(r.oth,p,t);
  A_(raw.cc).forEach(c=>TP[c]?r.cc.push(c):O('cc',c));O('cc',raw.cc_other);
+ if(raw.cnt&&typeof raw.cnt==='object')Object.entries(raw.cnt).forEach(([k,v])=>{if(r.cc.includes(k)&&num(v)!=null&&+v>=0)r.cnt[k]=String(Math.round(+v))});
  const ccs=r.cc.length?r.cc:S.cc,lo=uniFor(ccs,'loc'),qs=uniFor(ccs,'q'),sy=uniFor(ccs,'sym');
  if(raw.onset&&num(raw.onset.value)!=null&&['分鐘','小時','天','週'].includes(raw.onset.unit))r.onset={value:+raw.onset.value,unit:raw.onset.unit};
  if(raw.course){['加重','持平','改善','間歇'].includes(raw.course)?r.course=raw.course:O('hpi.course',raw.course)}
@@ -1171,7 +1183,7 @@ function normTr(raw){
 function rowsOf(r){const R=[],add=(l,v)=>{if(v!==''&&v!=null&&!(Array.isArray(v)&&!v.length))R.push([l,Array.isArray(v)?v.join('、'):String(v)])};
  if(r.chart==='nt'){
   if(r.pd){const q=r.pd;add('年齡',q.age?q.age.value+q.age.unit:'');add('性別',q.sex);add('體重',q.wt?q.wt+' kg':'');add('出生史',q.ga);add('預防接種',q.vax);add('發展',q.dev);add('飲食',q.feed);add('照顧環境',q.care)}
-  add('主訴',r.cc);add('開始時間',r.onset?(LANG==='zh'?r.onset.value+r.onset.unit+'前':r.onset.value+' '+(UNITEN[r.onset.unit]||r.onset.unit)+' ago'):'');add('變化趨勢',r.course);add('疼痛 NRS',r.nrs!=null?r.nrs+'/10':'');add('部位',r.loc);add('側別',r.side);add('性質',r.q);
+  add('主訴',r.cc);Object.entries(r.cnt||{}).forEach(([k,v])=>add('次數：'+k,v+' 次'));add('開始時間',r.onset?(LANG==='zh'?r.onset.value+r.onset.unit+'前':r.onset.value+' '+(UNITEN[r.onset.unit]||r.onset.unit)+' ago'):'');add('變化趨勢',r.course);add('疼痛 NRS',r.nrs!=null?r.nrs+'/10':'');add('部位',r.loc);add('側別',r.side);add('性質',r.q);
   add('有的症狀',r.sym_present);add('否認的症狀',r.sym_denied);Object.entries(r.ext).forEach(([l,v])=>add(l,v));add('過去病史',r.pmh);add('過敏',r.alg);add('個人史',r.soc);add('手術史',r.surg);
   Object.entries(r.pe).forEach(([s,e])=>add('理學檢查：'+s,e.st==='n'?'正常':'異常'+(e.f.length?'：'+e.f.join('、'):'')));add('診斷',r.dx.map(d=>d[0]))}
  else{if(r.pd){const q=r.pd;add('年齡',q.age?q.age.value+q.age.unit:'');add('性別',q.sex);add('體重',q.wt?q.wt+' kg':'')}add('外傷主訴',r.cc);add('受傷時間',r.time);add('受傷時間（描述）',r.when);add('機轉',r.moi);Object.entries(r.det).forEach(([m,d])=>add('細節：'+m,Object.entries(d).map(([l,v])=>l+' '+v)));add('意識喪失',r.loc);add('飲酒/藥物',r.alc);add('到院前處置',r.ems);
@@ -1184,6 +1196,7 @@ function commit(r){
  Object.entries(r.oth).forEach(([p,v])=>addTo(S.oth,p,v));
  if(r.chart==='nt'){const h=S.hpi;
   if(r.cc.length)S.cc=[...r.cc];
+  Object.assign(S.cnt,r.cnt||{});
   if(r.pd){const q=r.pd,P=pi();if(q.age){P.age=String(q.age.value);P.unit=q.age.unit}['sex','wt','ga','vax','dev','feed','care'].forEach(k=>{if(q[k])P[k]=q[k]})}
   if(r.onset){h.on=String(r.onset.value);h.unit=r.onset.unit}if(r.course)h.course=r.course;if(r.nrs!=null)h.nrs=r.nrs;if(r.side)h.side=r.side;
   h.loc=un(h.loc,r.loc);h.q=un(h.q,r.q);r.sym_present.forEach(s=>h.sym[s]=1);r.sym_denied.forEach(s=>h.sym[s]=-1);Object.assign(h.ext,r.ext);
