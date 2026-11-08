@@ -843,10 +843,13 @@ function sectionsProse(){
    const m=ABC_S[g[0]];const txt=m&&m[v];ps.push((txt||`${lcF(vv(g[0]))}: ${lcF(vv(v||''))}`)+(o?` (${o})`:''))}));
   if(ps.length)ps[0]='On primary survey, '+ps[0];
   Hp(Z('初步評估 Primary Survey','Primary survey'),ps.map((x,i)=>sent(i===0?x:capS(x))).join(' '));
-  const ss=Object.entries(t.reg).filter(x=>x[1].st||(x[1].n||[]).length).map(([r,e])=>{const nm=lcF(vv(r)),sd=(e.side||[]).map(vv).map(lcF),st=LL(`tr.reg.${r}.site`,e.site||[]).map(vv).map(lcF),f=LL(`tr.reg.${r}.f`,e.f||[]).map(vv).map(lcF),ng=andJ((e.n||[]).map(vv).map(lcF));
+  const regAll=Object.entries(t.reg).filter(x=>x[1].st||(x[1].n||[]).length),isClear=x=>x[1].st==='n'&&!(x[1].f||[]).length,clr=regAll.filter(isClear);
+  const ss=regAll.filter(x=>!isClear(x)).map(([r,e])=>{const nm=lcF(vv(r)),sd=(e.side||[]).map(vv).map(lcF),st=LL(`tr.reg.${r}.site`,e.site||[]).map(vv).map(lcF),f=LL(`tr.reg.${r}.f`,e.f||[]).map(vv).map(lcF),ng=andJ((e.n||[]).map(vv).map(lcF));
    const subj2=`the ${[...sd,nm].join(' ')}${st.length?' ('+st.join(', ')+')':''}`;
    let s1=e.st==='n'?`${subj2} has no injury`:e.st==='a'?`${subj2} ${f.length?'shows '+andJ(f):'is injured'}`:'';
    if(ng)s1+=s1?`. There is no ${ng}`:`${subj2} reveals no ${ng}`;return s1});
+  if(clr.length){const nms=clr.map(([r,e])=>`the ${[...(e.side||[]).map(vv).map(lcF),lcF(vv(r))].join(' ')}`),ng=[...new Set(clr.flatMap(([r,e])=>(e.n||[]).map(vv).map(lcF)))];
+   ss.push(`${andJ(nms)} ${clr.length>1?'show':'shows'} no injury${ng.length?`, with no ${andJ(ng)}`:''}`)}
   if(ss.length)ss[0]='On secondary survey, '+ss[0];
   Hp(Z('傷處檢查 Secondary Survey','Secondary survey'),ss.map((x,i)=>sent(i===0?x:capS(x))).join(' '));
   const h2=[...hist];if(t.meal)h2.push(`The last meal was at ${t.meal}.`);const teta=J('tr.teta',t.teta);if(teta)h2.push(`Tetanus vaccination status: ${lcF(vv(teta))}.`);
@@ -925,7 +928,7 @@ const enOf=w=>{const e=EN[w];return e?strip(e).toLowerCase():null};
 const escRe=s=>s.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&');
 const wordIdx=(tl,w)=>{const m=new RegExp('(?<![a-z0-9])'+escRe(w)+(w.length<=4?'(?![a-z0-9])':''),'i').exec(tl);return m?m.index:-1};
 const lev1=(a,b)=>{if(a===b)return true;if(Math.abs(a.length-b.length)>1)return false;let i=0;while(i<a.length&&i<b.length&&a[i]===b[i])i++;if(a.length===b.length)return a.slice(i+1)===b.slice(i+1);return a.length>b.length?a.slice(i+1)===b.slice(i):a.slice(i)===b.slice(i+1)};
-const fuzzyIdx=(tl,w)=>{if(w.length<6||/\s/.test(w))return -1;const re=/[a-z]+/g;let m;while((m=re.exec(tl))){if(m[0].length>=w.length-1&&m[0].length<=w.length+1&&lev1(m[0],w))return m.index}return -1};
+const fuzzyIdx=(tl,w)=>{if(w.length<8||/\s/.test(w))return -1;const re=/[a-z]+/g;let m;while((m=re.exec(tl))){if(m[0].length>=w.length-1&&m[0].length<=w.length+1&&lev1(m[0],w))return m.index}return -1};
 const idxOf=(t,w,tl)=>{if(w.length<=4&&/^[\x00-\x7f]+$/.test(w)){const j=wordIdx(tl,w.toLowerCase());return j>=0?j:-1}const i=t.indexOf(w);if(i>=0)return i;if(/^[\x00-\x7f]+$/.test(w)){const j=wordIdx(tl,w.toLowerCase());return j>=0?j:fuzzyIdx(tl,w.toLowerCase())}const e=enOf(w);if(e&&e.length>=3&&/[a-z]/.test(e)){const j=wordIdx(tl,e);if(j>=0)return j}return -1};
 const hit=(t,terms)=>{const tl=t.toLowerCase();for(const w of terms){const i=idxOf(t,w,tl);if(i>=0)return isNeg(t,i)?-1:1}return 0};
 const CCEN={'胸痛':['chest pain','chest tightness'],'呼吸困難':['shortness of breath','dyspnea','difficulty breathing','sob'],'腹痛':['abdominal pain','belly pain','stomach pain'],'噁心嘔吐':['vomiting','nausea and vomiting'],'腹瀉':['diarrhea'],'頭痛':['headache'],
@@ -1003,9 +1006,9 @@ function parseCollision(t){
 const NEGSWEEP={neck:'頸部',head:'頭部/頭皮',chest:'胸部',abd:'腹部',abdomen:'腹部',abdominal:'腹部',pelvis:'骨盆/會陰',pelvic:'骨盆/會陰',back:'背部/脊椎',spine:'背部/脊椎'};
 function expandNegSweep(t,reg){
  for(const m of t.matchAll(/\b(?:no|denied|without)\s+((?:[a-z]+\s?\/\s?)*[a-z]+)\s+(?:pain|tenderness|injury|wound)/gi))
-  m[1].split(/\s*\/\s*/).forEach(w=>{const g=NEGSWEEP[w.toLowerCase()];if(g&&!reg[g])reg[g]={st:'n',f:[],n:[],side:[],site:[]}});
+  m[1].split(/\s*\/\s*/).forEach(w=>{const g=NEGSWEEP[w.toLowerCase()];if(g&&(!reg[g]||(reg[g].st!=='a'&&!(reg[g].f||[]).length)))reg[g]=Object.assign(reg[g]||{f:[],n:[],side:[],site:[]},{st:'n'})});
  for(const m of t.matchAll(/(?:無|沒有)([頸頭胸腹背骨盆\/、，]{1,10})(?:痛|傷)/g))
-  [...m[1]].forEach(c=>{const g={頸:'頸部',頭:'頭部/頭皮',胸:'胸部',腹:'腹部',背:'背部/脊椎',骨:'骨盆/會陰',盆:'骨盆/會陰'}[c];if(g&&!reg[g])reg[g]={st:'n',f:[],n:[],side:[],site:[]}})}
+  [...m[1]].forEach(c=>{const g={頸:'頸部',頭:'頭部/頭皮',胸:'胸部',腹:'腹部',背:'背部/脊椎',骨:'骨盆/會陰',盆:'骨盆/會陰'}[c];if(g&&(!reg[g]||(reg[g].st!=='a'&&!(reg[g].f||[]).length)))reg[g]=Object.assign(reg[g]||{f:[],n:[],side:[],site:[]},{st:'n'})})}
 function parseTocc(t,r){const m=t.match(/\bTOCC\b\s*[:：]?\s*([^.;\n]{0,100})/i);if(!m)return null;const x=m[1].trim(),o={};
  if(!x||/^(?:nil|none|negative|neg|no|無|陰性|-)(?![a-z])/i.test(x)){o.t='無';o.o='無';o.c='無';o.k='無';return o}
  x.split(/[,，;、]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{const neg=/^(?:no|nil|none|無|沒有)\b/i.test(s)||/\(-\)$/.test(s);
@@ -1207,13 +1210,14 @@ function ruleTr(t00){
   if(!e.f.length&&!e.site.length){if(e.n.length)e.st='';else delete r.reg[rg]}});
  Object.entries(REG).forEach(([rg,def])=>{if(def.sites)return;def.f.forEach(f=>{const w=strip(f);if(w.length>=4&&t.includes(w)&&!isNeg(t,t.indexOf(w))){const e=r.reg[rg]=r.reg[rg]&&r.reg[rg].st==='a'?r.reg[rg]:{st:'a',f:[],side:[],site:[]};if(!e.f.includes(f))e.f.push(f)}})});
  expandNegSweep(t,r.reg);
- if(/full ROM|free limb|limb (?:movement|motion) (?:is )?free|moves? all (?:four )?extremities freely|活動(?:度)?(?:正常|良好)|肢體可動/i.test(t))['上肢','下肢'].forEach(k=>{const e=(r.reg[k]=r.reg[k]||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!e.n.includes('活動受限')&&!(e.f||[]).includes('活動受限'))e.n.push('活動受限')});
+ if(/full ROM|free limb|limb (?:movement|motion) (?:is )?free|moves? all (?:four )?extremities freely|活動(?:度)?(?:正常|良好)|肢體可動/i.test(t))['上肢','下肢'].forEach(k=>{const e=(r.reg[k]=r.reg[k]||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!e.n.includes('活動受限')&&!(e.f||[]).includes('活動受限'))e.n.push('活動受限');if(e.st!=='a'&&!(e.f||[]).length)e.st='n'});
  if(/can walk|able to walk|weight[- ]bearing(?<!non-weight[- ]bearing)|ambulat(?:e|ory|ing)|可以走|可行走|可負重/i.test(t)&&!/non[- ]?weight|unable to (?:walk|bear)|cannot (?:walk|bear)|無法(?:負重|行走)/i.test(t)){const e=(r.reg['下肢']=r.reg['下肢']||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!(e.f||[]).includes('無法負重')&&!e.n.includes('無法負重'))e.n.push('無法負重')}
- if(/\bno (?:numbness|paresthesia|tingling)|無麻木|沒有麻木/i.test(t))['上肢','下肢'].forEach(k=>{const e=(r.reg[k]=r.reg[k]||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!e.n.includes('感覺或運動異常'))e.n.push('感覺或運動異常')});
+ if(/\bno (?:numbness|paresthesia|tingling)|無麻木|沒有麻木/i.test(t))['上肢','下肢'].forEach(k=>{const e=(r.reg[k]=r.reg[k]||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!e.n.includes('感覺或運動異常'))e.n.push('感覺或運動異常');if(e.st!=='a'&&!(e.f||[]).length)e.st='n'});
  const ENT=['眼','耳','鼻','口腔/牙齒','咽喉'],owners={};ENT.forEach(rg=>REG[rg].f.forEach(f=>(owners[f]=owners[f]||[]).push(rg)));
  const ctx=ENT.filter(rg=>REGKW[rg].some(k=>t.includes(k))||REGEN[rg].some(k=>new RegExp('\\b'+k+'\\b','i').test(t)));
  ENT.forEach(rg=>REG[rg].f.forEach(f=>{if(owners[f].length>1&&!ctx.includes(rg)&&!(ctx.length===0&&owners[f][0]===rg))return;const al=[strip(f),...(FIND_AL[f]||[]),enOf(f)].filter(Boolean);
   const hh=hit(t,al);if(hh===1){const e=r.reg[rg]=r.reg[rg]&&r.reg[rg].st==='a'?r.reg[rg]:{st:'a',f:[],n:(r.reg[rg]&&r.reg[rg].n)||[],side:[],site:[]};if(!e.f.includes(f))e.f.push(f)}else if(hh===-1){const e=(r.reg[rg]=r.reg[rg]||{st:'',f:[],n:[],side:[],site:[]});e.n=e.n||[];if(!e.n.includes(f))e.n.push(f)}}));
+ ENT.forEach(rg=>{const e=r.reg[rg];if(e&&e.st===''&&!(e.f||[]).length&&(e.n||[]).length)e.st='n'});
  ['眼','耳'].forEach(rg=>{const e=r.reg[rg];if(!e||e.st!=='a'||e.side.length)return;const w=rg==='眼'?'眼':'耳',en=rg==='眼'?'eyes?':'ears?';
   if(new RegExp('雙'+w+'|兩'+w+'|both '+en+'|bilateral','i').test(t))e.side=['雙側'];else if(new RegExp('左'+w+'|left '+en,'i').test(t))e.side=['左'];else if(new RegExp('右'+w+'|right '+en,'i').test(t))e.side=['右']});
  if(fbo){const w=(fbo[1]||fbo[2]||fbo[3]||'').toLowerCase(),rg=FBO_RG[w];if(rg){const e=r.reg[rg]=r.reg[rg]&&r.reg[rg].st==='a'?r.reg[rg]:{st:'a',f:[],side:[],site:[]};if(!e.f.includes(FBO_F[rg]))e.f.push(FBO_F[rg])}}
