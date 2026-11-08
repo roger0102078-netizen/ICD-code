@@ -911,7 +911,7 @@ const hhmm=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).pa
 const NEGRE=/否認|沒有|並無|未見|不曾|不(?=抽|喝|吸|嚼)|無(?!法|力|礙|規則)|未(?!明)/;
 const partEdge=(t,i)=>{let s=i;while(s>0&&!/[，,。；;\n]/.test(t[s-1]))s--;return s};
 const sentEdge=(t,i)=>{let s=i;while(s>0&&!/[。；;\n]/.test(t[s-1])&&!(t[s-1]==='.'&&!/\d/.test(t[s]||'')))s--;return s};
-const NEGSTOP=/\b(?:but|however|while|except|although|present|positive|reports?|complains?|noted|has|had|having|presented|since|with|c\/o)\b|\(\+\)/i;
+const NEGSTOP=/\b(?:soft|flat|normal|intact|clear|supple|distended|tender|tenderness|swelling|over|at|in|on|but|however|while|except|although|present|positive|reports?|complains?|noted|has|had|having|presented|since|with|c\/o)\b|\(\+\)/i;
 const POSTPOS=/\b(?:for\s+\d|since\b|x\s?\d|\d+\s*(?:days?|hours?|times?|weeks?|hrs?)|present\b)/i;
 const isNegEn=(t,i)=>{const seg=t.slice(sentEdge(t,i),i),a=[...seg.matchAll(/\b(?:denies|denied|deny|negative for|without|absent|no|not|nil)\b/gi)].pop();if(!a)return false;
  const after=seg.slice(a.index+a[0].length);if(NEGSTOP.test(after))return false;
@@ -1054,7 +1054,7 @@ function ruleNt(t0){
  const ccs=r.cc.length?r.cc:S.cc,lo=uniFor(ccs,'loc'),qs=uniFor(ccs,'q'),sy=uniFor(ccs,'sym');
  const rt=relTime(numNorm(t));if(rt)r.onset=rt.n===0.5&&rt.unit==='小時'?{value:30,unit:'分鐘'}:{value:rt.n,unit:rt.unit};
  const wk=t.match(/(\d+)\s*(?:週|周)前/);if(wk)r.onset={value:+wk[1],unit:'週'};
- if(!r.onset){const d=sinceClock(tp)||parseDuration(numNorm(tp));if(d)r.onset=d}
+ if(!r.onset){const sc=sinceClock(tp),d=sc||parseDuration(numNorm(tp));if(d)r.onset=d;if(sc){const cm=tp.match(/\bsince\s+(\d{1,2}(?:[:：]\d{2}|\s*[ap]m))/i);if(cm)r.note=(r.note?r.note+'；':'')+'Symptoms started since '+cm[1].replace('：',':')+'.'}}
  const nm=t.match(/(?:NRS|疼痛指數|pain (?:score|scale))\D{0,4}(\d{1,2})/i)||t.match(/(\d{1,2})\s*(?:\/\s*10|out of 10|分(?!鐘))/i);if(nm&&+nm[1]<=10)r.nrs=+nm[1];
  if(/越來越|愈來愈|加重|變嚴重|worsening|getting worse|progressive/i.test(t))r.course='加重';else if(/改善|緩解|好轉|improving|improved|resolving/i.test(t))r.course='改善';else if(/持平|沒變|差不多|unchanged|stable|no change/i.test(t))r.course='持平';else if(/時好時壞|間歇|陣發|intermittent|waxing and waning|comes and goes/i.test(t))r.course='間歇';
  const lm=lo.filter(l=>hit(body,[l])===1||locAb(body,l));r.loc=lm.filter(l=>!lm.some(o=>o!==l&&o.includes(l)));
