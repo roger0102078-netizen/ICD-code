@@ -147,6 +147,7 @@ pre.json{margin:0;font-family:var(--mono);font-size:12px;white-space:pre-wrap;wo
   <div><div class="name">急診結構化病歷</div><div class="meta"><span id="ptAge"></span></div></div>
   <div class="grow"></div>
   <div class="modebar"><span>病歷類型</span><div class="seg" id="modeSeg"><button type="button" class="nt" data-mode="nt">非外傷</button><button type="button" class="tr" data-mode="tr">外傷</button><button type="button" class="pd" data-mode="pd">小兒</button></div></div>
+  <button type="button" class="btn" id="newPt" title="清空所有欄位，開始下一位病人">新病人</button>
   <button type="button" class="btn" id="kbBtn" aria-controls="kb">快速鍵 ?</button>
   <div id="triBadge"></div>
 </header>
@@ -350,6 +351,7 @@ const S={mode:'nt',tri:{...PRE.nt},
  oth:{},cnt:{},tocc:{t:'',o:'',c:'',k:''},nl:'',nlres:null,pt:{age:'',unit:'歲',sex:'',wt:''},pd:{age:'',unit:'歲',sex:'',wt:'',ga:'',vax:'',dev:'',feed:'',care:''},cc:[],
  hpi:blankHpi(),pmh:[],alg:[],soc:[],surg:'',pe:{},dx:[],
  tr:{hs:{},cc:[],time:'',when:'',loc:'',alc:'',moi:[],det:{},ems:[],abc:{},gcs:{e:'',v:'',m:''},reg:{},meal:'',teta:'',dx:[]}};
+const S0=JSON.stringify(S);let newPtTimer=null;
 const gset=t=>['e','v','m'].every(k=>t.gcs[k]!=='');
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1025,12 +1027,16 @@ function ruleBg(t,r,pmhList,algList){
 function ruleDx(t,r,dxMap){pickDx(t,Object.keys(dxMap)).forEach(n=>r.dx.push([n,dxMap[n]]))}
 
 function stripPd(p){if(!p)return null;if(!isPd())['ga','vax','dev','feed','care'].forEach(k=>delete p[k]);return Object.keys(p).length?p:null}
+const ABBR_U=/(?<![\w.\/-])(\d{1,3})\s?\/?\s?([MF])(?![A-Za-z])(?!\s*(?:height|high|tall))/,ABBR_L=/(?<![\w.\/-])(\d{1,3})\s?\/\s?([mf])(?![A-Za-z])/;
+const abbrAS=t=>{const m=ABBR_U.exec(t)||ABBR_L.exec(t);return m&&+m[1]<=120?{age:+m[1],sex:/m/i.test(m[2])?'男':'女'}:null};
 function parsePd(t){const p={};let m;
  if(m=t.match(/(\d+(?:\.\d+)?)\s*(?:個月|月大|months?|mos?\b|-month)/i))p.age={value:+m[1],unit:'月'};
  else if(m=t.match(/(\d+)\s*(?:週大|weeks?[- ]old)/i))p.age={value:+m[1]*7,unit:'天'};
  else if(m=t.match(/(\d+)\s*(?:天大|days?[- ]old)/i))p.age={value:+m[1],unit:'天'};
  else if(m=t.match(/(\d+)\s*(?:歲|years?|yrs?|y\/?o\b|-year)/i))p.age={value:+m[1],unit:'歲'};
+ else if(m=abbrAS(t))p.age={value:m.age,unit:'歲'};
  if(/男童|男孩|男嬰|男性|先生|\b(?:boy|male|man|gentleman|guy|son)\b/i.test(t))p.sex='男';else if(/女童|女孩|女嬰|女性|女士|小姐|\b(?:girl|female|woman|lady|daughter)\b/i.test(t))p.sex='女';
+ else if(m=abbrAS(t))p.sex=m.sex;
  if(m=t.match(/(\d+(?:\.\d+)?)\s*(?:kg|公斤)/i))p.wt=m[1];
  if(/早產|premature|preterm/i.test(t))p.ga='早產（<37 週）';else if(/足月|full[- ]term|\bterm (?:infant|baby)/i.test(t))p.ga='足月';
  if(/(?:疫苗|預防接種)(?:完整|按時|齊全|依時程)|vaccin\w* up[- ]to[- ]date|immunizations? up[- ]to[- ]date|fully vaccinated/i.test(t))p.vax='依時程完成';else if(/未接種|unvaccinated|not vaccinated/i.test(t))p.vax='未接種';
@@ -1385,7 +1391,11 @@ async function runAi(){const t=S.nl.trim();if(!t){NL.msg=Z('請先輸入文字�
   nlDone(isTr()?normTr(raw):normNt(raw),Z('AI 解析','AI parse'))}
  catch(e){NL.busy=false;const c=e&&e.code;NL.msg=c==='cancelled'?Z('已停止。','Stopped.'):c==='not_granted'||c==='sampling_disabled'?Z('未允許使用 AI，請改用快速解析。','AI use was not allowed. Please use quick parse.'):c==='rate_limited'?Z('使用太頻繁，請稍後再試，或改用快速解析。','Too many requests. Try again later or use quick parse.'):c==='invalid_json'?Z('AI 回覆格式無法讀取，請再試一次或改用快速解析。','Could not read the AI reply. Try again or use quick parse.'):Z('AI 解析失敗，請再試一次或改用快速解析。','AI parsing failed. Try again or use quick parse.');renderNL()}
  finally{nlCtl=null}}
-document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(!id)return;
+document.addEventListener('click',e=>{const b0=e.target.closest('button');if(b0&&b0.id==='newPt'){
+ if(!newPtTimer){b0.textContent='再按一次：清空';b0.classList.add('pri');newPtTimer=setTimeout(()=>{newPtTimer=null;b0.textContent='新病人';b0.classList.remove('pri')},3000);return}
+ clearTimeout(newPtTimer);newPtTimer=null;b0.textContent='新病人';b0.classList.remove('pri');
+ const f=JSON.parse(S0),keep=S.mode;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,f);S.mode=keep;NL.msg='';rebuild();update();renderNL();toast(Z('已清空，可輸入下一位病人','Cleared. Ready for the next patient.'));return}
+ const id=b0?.id;if(!id)return;
  if(id==='nlAi')runAi();else if(id==='nlRule')runRule();else if(id==='nlStop')nlCtl?.abort();
  else if(id==='nlCancel'){S.nlres=null;NL.msg='';renderNL()}
  else if(id==='nlApply'&&S.nlres){const n=rowsOf(S.nlres).length;commit(S.nlres);S.nlres=null;NL.msg=Z('已套用 '+n+' 項，請檢查下方欄位。','Applied '+n+' item(s). Please check the fields below.');rebuild();update();renderNL();toast(Z('已套用 '+n+' 項','Applied '+n+' item(s)'))}});
