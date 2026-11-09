@@ -972,11 +972,15 @@ const emptyTr=()=>({chart:'tr',pd:null,hs:{},cc:[],time:'',when:'',moi:[],det:{}
 /* ---- 文字前處理：剝掉前言、(+)/(-)、年齡性別縮寫，避免整句被誤判為否認 ---- */
 const stripFront=t=>t
  .replace(/\b(?:underlying|PHx?|Px|PMH|Hx|allergy|TOCC)\s*[:：]?\s*(?:nil|none|negative)\b/gi,' ')
- .replace(/\b(?:den(?:y|ied|ies)|no|without)\s+(?:any\s+)?(?:known\s+)?(?:systemic|underlying|chronic|medical|past)\s+(?:diseases?|illness(?:es)?|hx|history)\b/gi,' ')
+ .replace(/\b(?:den(?:y|ied|ies)|no|without)(?:\s+of)?\s+(?:any\s+)?(?:known\s+)?(?:systemic|underlying|chronic|medical|past)\s+(?:diseases?|dx|illness(?:es)?|hx|PHx|PMH|history)\b/gi,' ')
  .replace(/\bNKD?A\b/gi,' ')
  .replace(/\b(?:den(?:y|ied|ies)|no)\s+(?:pregnan\w+|abd(?:ominal)?\s+op\w*|alcohol)\b/gi,' ')
  .replace(/(?:否認|無|沒有)\s*(?:可能)?懷孕[，,、\s]*/g,' ');
-const normPM=t=>t.replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*-\s*\)/g,'no $1').replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*\+\s*\)/g,'$1 present');
+const BPW='neck|chest|abdomen|abdominal|abd|back|head|pelvis|pelvic|limbs?|extremit(?:y|ies)|arms?|legs?|spine|flank|shoulders?|hips?|knees?|ankles?|wrists?|elbows?|thoracic|lumbar|cervical|c-spine|face|facial|eyes?|ears?|nose|throat|jaw',
+ NEGLIST=new RegExp('\\b(no|denied|denies|without|negative for)\\s+((?:'+BPW+')(?:\\s*(?:,|\\/|\\band\\b|\\bor\\b)\\s*(?:'+BPW+'))+)\\s+(pain|tenderness|injury|trauma|swelling|numbness|deformity)\\b','gi');
+const TYPOS=[[/\bden(?:eid|yed|id|ide)\b/gi,'denied'],[/\bhea+dache?\b|\bhedache\b/gi,'headache'],[/\bcont[ua]ss?i?on?\b|\bcontusin\b|\bcontution\b/gi,'contusion'],[/\bec+h?[yi]mos[ie]s\b/gi,'ecchymosis'],[/\bfinver\b|\bfingre\b|\bfnger\b/gi,'finger'],[/\b(systemic|chronic|underlying|past)\s+dx\b/gi,'$1 disease'],[/\bA\/W\b/g,'abrasion'],[/\bL\/W\b/g,'laceration']];
+const fixTypos=t=>TYPOS.reduce((s,[re,r])=>s.replace(re,r),t.replace(/\babd\.(?=\s|\/|,|$)/gi,'abdomen')).replace(NEGLIST,(m,n,list,noun)=>list.split(/\s*(?:,|\/|\band\b|\bor\b)\s*/).filter(Boolean).map(i=>n+' '+i+' '+noun).join(', '));
+const normPM=t=>fixTypos(t).replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*-\s*\)/g,'no $1').replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*\+\s*\)/g,'$1 present');
 const AGESEX=/\b\d{1,3}\s?(?:[MF](?!\s*height)\b|\/\s?[MFmf]\b)/g;const dropAgeSex=t=>t.replace(AGESEX,' ');
 const prep=t=>normPM(stripFront(t));
 const CCMARK=/(?:due to|because of|came (?:to (?:the )?(?:ED|emergency department) )?(?:for|with|because(?: of)?)|present(?:ed|ing) with|chief complaint|\bCC\s*[:：]|主訴|因為|因)\s*[:：]?\s*/i;
@@ -1005,7 +1009,7 @@ function parseCollision(t){
  return {moi:/scooter|motor|bike|bicycle/i.test(m[1])?'機車/自行車事故':'汽車事故','碰撞對象':/scooter|motor|bike/i.test(m[2])?'機車':/truck|bus|van/i.test(m[2])?'大型車':/car/i.test(m[2])?'汽車':'固定物'}}
 const NEGSWEEP={neck:'頸部',head:'頭部/頭皮',chest:'胸部',abd:'腹部',abdomen:'腹部',abdominal:'腹部',pelvis:'骨盆/會陰',pelvic:'骨盆/會陰',back:'背部/脊椎',spine:'背部/脊椎'};
 function expandNegSweep(t,reg){
- for(const m of t.matchAll(/\b(?:no|denied|without)\s+((?:[a-z]+\s?\/\s?)*[a-z]+)\s+(?:pain|tenderness|injury|wound)/gi))
+ for(const m of t.matchAll(/\b(?:no|denied|without)\s+((?:[a-z]+\s?\/\s?)*[a-z]+)\s+(?:pain|tenderness|injury|trauma|wound)/gi))
   m[1].split(/\s*\/\s*/).forEach(w=>{const g=NEGSWEEP[w.toLowerCase()];if(g&&(!reg[g]||(reg[g].st!=='a'&&!(reg[g].f||[]).length)))reg[g]=Object.assign(reg[g]||{f:[],n:[],side:[],site:[]},{st:'n'})});
  for(const m of t.matchAll(/(?:無|沒有)([頸頭胸腹背骨盆\/、，]{1,10})(?:痛|傷)/g))
   [...m[1]].forEach(c=>{const g={頸:'頸部',頭:'頭部/頭皮',胸:'胸部',腹:'腹部',背:'背部/脊椎',骨:'骨盆/會陰',盆:'骨盆/會陰'}[c];if(g&&(!reg[g]||(reg[g].st!=='a'&&!(reg[g].f||[]).length)))reg[g]=Object.assign(reg[g]||{f:[],n:[],side:[],site:[]},{st:'n'})})}
@@ -1015,13 +1019,26 @@ function parseTocc(t,r){const m=t.match(/\bTOCC\b\s*[:：]?\s*([^.;\n]{0,100})/i
   const key=/travel|trip|abroad|旅/i.test(s)?'t':/occupation|work|job|職業|工作/i.test(s)?'o':/cluster|classmate|school|daycare|family|群聚|同學|同事|家人/i.test(s)?'k':'c';
   o[key]=neg?'無':'有';if(!neg)addTo(r.oth,'tocc.'+key,s)});
  return Object.keys(o).length?o:null}
+function ruleAnticoag(t,r){const AC=/anticoagul\w*|warfarin|coumadin|\b(?:DOAC|NOAC)\b|apixaban|eliquis|rivaroxaban|xarelto|dabigatran|edoxaban|clopidogrel|plavix|antiplatelet|aspirin|bokey|ticagrelor|brilinta|pradaxa|lixiana|savaysa|cilostazol|pletaal|persantin|\bASA\b|antithrombotic|blood thinners?|血液稀釋|抗凝血|抗血小板|阿斯匹靈|阿斯匹林/ig,hits=new Set();
+ t.split(/[.;\n，。,]/).forEach(c=>{if(/allerg|過敏/i.test(c))return;for(const m of c.matchAll(AC)){if(/\b(?:no|not|denied|denies|without|nil|stop(?:ped)?)\b|無|沒|否認|停/i.test(c.slice(0,m.index)))continue;hits.add(m[0].toLowerCase())}});
+ if(hits.size)addTo(r.oth,'pmh','Anticoagulant/antiplatelet: '+[...hits].join(', '))}
+function parseTeta(t,r){
+ const TT='(?:tetanus|\\bTd\\b|Tdap|\\bTT\\b|破傷風)';
+ if(new RegExp(TT+'[^.;\\n]{0,25}\\b(?:given|administered|injected|today|in (?:the )?ED|here)\\b|\\b(?:given|administered|gave|received|got)\\b[^.;\\n]{0,15}'+TT+'[^.;\\n]{0,20}\\b(?:today|in (?:the )?ED|here|this visit)\\b|本次[^，。]{0,4}破傷風|給予破傷風|已打破傷風','i').test(t))return '本次已給予';
+ const m=new RegExp(TT,'i').exec(t);if(!m)return '';
+ const pre=t.slice(Math.max(0,m.index-30),m.index),post=t.slice(m.index,m.index+45).split(/[.;\n]/)[0],yr=(post.match(/(\d+)\s*(?:years?|yrs?|y\b|年)/i)||[])[1];
+ const nm=/\b(?:no|not|never|without|denied?|missed)\b((?:\s+\w+){0,3})\s*$/i.exec(pre),neg=(!!nm&&/^(?:\s+(?:receive|received|receiving|have|had|get|got|take|taken|any|the|a|prior|previous))*$/i.test(nm[1]))||/^[^,;，]{0,22}(?:\(-\)|:\s*no\b|\bunknown\b|\bunclear\b|\bnone\b|未|沒|不詳)/i.test(post);
+ const yt=yr?(' within '+yr+' year'+(+yr>1?'s':'')):'';
+ if(neg){if(r)r.note=(r.note?r.note+'；':'')+'No tetanus vaccine'+(yr?' in recent '+yr+' year'+(+yr>1?'s':''):'')+'.';return yr&&+yr<=5?'需追加（髒傷口 >5 年）':'超過 10 年或不詳'}
+ if(/\b(?:have|has|had|received|completed|done|up[- ]to[- ]date|present|within|given|vaccinated)\b|\(\+\)|有打|已打|接種過|年內|\bvaccine\b/i.test(pre+post)){if(r)r.note=(r.note?r.note+'；':'')+'Tetanus vaccine'+(yr?' received in recent '+yr+' year'+(+yr>1?'s':''):' received')+'.';return yr&&+yr>10?'超過 10 年或不詳':'10 年內曾接種'}
+ return ''}
 function ruleBg(t,r,pmhList,algList){
  Object.entries(PMHAL).forEach(([k,al])=>{const h=hit(t,al);if(h===1&&pmhList.includes(k))r.pmh.push(k)});
- if(!r.pmh.length&&pmhList.includes('無特殊病史')&&(/無(?:系統性|慢性|特殊)?(?:疾病|病史|病)|既往體健|沒有慢性病/.test(t)||/\b(?:no|den(?:y|ied|ies))\s+(?:any\s+)?(?:known\s+)?(?:systemic|chronic|underlying|significant|past)?\s*(?:diseases?|illness(?:es)?|conditions?|medical history|history|PHx?|PMH|Hx|comorbidit\w+)\b|\b(?:previously|otherwise|generally) healthy\b|\bhealthy (?:child|boy|girl|patient)\b/i.test(t)))r.pmh=['無特殊病史'];
+ if(!r.pmh.length&&pmhList.includes('無特殊病史')&&(/無(?:系統性|慢性|特殊)?(?:疾病|病史|病)|既往體健|沒有慢性病/.test(t)||/\b(?:no|den(?:y|ied|ies))(?:\s+of)?\s+(?:any\s+)?(?:known\s+)?(?:systemic|chronic|underlying|significant|past)?\s*(?:diseases?|dx|illness(?:es)?|conditions?|medical history|history|PHx?|PMH|Hx|comorbidit\w+)\b|\b(?:previously|otherwise|generally) healthy\b|\bhealthy (?:child|boy|girl|patient)\b/i.test(t)))r.pmh=['無特殊病史'];
  if(r.pmh.includes('無特殊病史'))r.pmh=['無特殊病史'];
  {const hm0=t.match(/\b(?:Hx of|history of|PMH|PHx|Px|underlying)\b\s*[:：]?\s*([^.;\n]{2,160})/i),hm=hm0&&!/^\s*(?:nil|none|negative|no\b)/i.test(hm0[1])?[hm0[0],hm0[1].split(/\bTOCC\b/i)[0]]:null;if(hm&&pmhList.includes('無特殊病史')){const all=Object.values(PMHAL).flat();
   hm[1].split(/[,，;、\/]|\band\b|\bwith\b/i).map(s=>s.trim()).filter(s=>s&&s.length<=40&&!/\b(?:cough|fever|sputum|phlegm|pain|vomit\w*|diarrhea|rhinorrhea|runny|dyspnea|nausea|headache|dizz\w*|chills|sore throat|rash)\b/i.test(s)&&!/^(?:nil|none|negative|no|nka|unknown|nil\.)$/i.test(s)&&!/^(?:no\b|den(?:y|ied|ies)\b|nka\b|nkda\b|without\b)|allerg|過敏/i.test(s)&&!/\b(?:since|for \d|presented|came|due)\b/i.test(s)).forEach(s=>{if(!hit(s,all))addTo(r.oth,'pmh',s)})}}
- if(/(無|否認|沒有)(?:已知)?(?:藥物|食物)?過敏/.test(t)||/\b(?:NKDA|NKA)\b|\b(?:no|denies)\s+(?:known\s+)?(?:drug\s+|food\s+)?allerg/i.test(t))r.alg=['無已知過敏'];
+ if(/(無|否認|沒有)(?:已知)?(?:藥物|食物)?過敏/.test(t)||/\b(?:NKDA|NKA)\b|\b(?:no|den(?:y|ied|ies))(?:\s+of)?\s+(?:any\s+)?(?:known\s+)?(?:drugs?\s+|medications?\s+|food\s+)*allerg/i.test(t))r.alg=['無已知過敏'];
  else{const ALGAL={'NSAIDs':/aspirin|ibuprofen|diclofenac|naproxen|ketorolac|celecoxib|阿斯匹靈|阿斯匹林/i,'青黴素類':/penicillin|amoxicillin|ampicillin|augmentin|盤尼西林/i,'磺胺類':/sulfa|sulfonamide|bactrim/i};
   Object.entries(ALGAL).forEach(([k,re])=>{if(algList.includes(k)&&re.test(t)&&/過敏|allerg/i.test(t)&&!r.alg.includes(k))r.alg.push(k)});
   ALG.slice(1).forEach(a=>{const w={'青黴素類':'青黴素','磺胺類':'磺胺','NSAIDs':'NSAID'}[a]||a,e=(enOf(a)||'').replace(/s$/,'');if((t.includes(w)||(e.length>=4&&t.toLowerCase().includes(e)))&&/過敏|allerg/i.test(t))r.alg.push(a)});
@@ -1091,7 +1108,7 @@ function ruleNt(t0){
    if(sev.test(t))v='明顯減少';else if(ok.test(t))v='正常';else if(dec.test(t))v='減少'}
   else if(ty==='sel'){const o=op.find(x=>t.includes(x)&&!isNeg(t,t.indexOf(x)));if(o)v=o}
   if(v)r.ext[l]=v});
- ruleBg(bgBody,r,PMHX(),ALG);
+ ruleBg(bgBody,r,PMHX(),ALG);ruleAnticoag(bgBody,r);
  r.pd=stripPd(parsePd(bgBody));r.tocc=parseTocc(bgBody,r);
  Object.entries(SOCAL).forEach(([k,al])=>{if(hit(bgBody,al)===1)r.soc.push(k)});
  const ms=[],seen=new Set();Object.entries(SYSX()).forEach(([s,fs])=>fs.forEach(f=>{const w=strip(f);const hh=seen.has(w)?0:(f==='壓痛'&&/\b(?:rebound|abdominal|epigastric|RLQ|RUQ|LLQ|LUQ|suprapubic|CVA|costovertebral|chest wall|spinal|cervical|midline|flank)\b[^,.;]{0,12}tender|tender\w*\s+(?:at|over|in|on)\s+(?:the\s+)?(?:epigastr|abdom|RLQ|RUQ|LLQ|LUQ|suprapubic|flank|CVA|chest wall)/i.test(body)?0:hit(body,[w,...(PE_AL[f]||[])]));if(hh){seen.add(w);ms.push([s,f,w,hh])}}));
@@ -1101,7 +1118,7 @@ function ruleNt(t0){
   else{const ea=[...(PEEN[s]||[]),...(enOf(s)?[enOf(s)]:[])];if(ea.some(a=>new RegExp('\\b'+a.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')+'\\b[^,.;]{0,24}\\b(?:normal|unremarkable|clear|regular|soft|non-?tender|benign)\\b','i').test(body)))r.pe[s]={...(r.pe[s]||{n:[]}),st:'n',f:[]}}});
  ruleDx(t0,r,DXM());return r}
 
-const MOIAL={'機車/自行車事故':['機車','摩托車','腳踏車','自行車','單車','騎車'],'汽車事故':['汽車','開車','轎車','貨車'],'行人被撞':['行人','被車撞'],'墜落':['墜落','摔下','跌落','高處'],'跌倒（平地）':['跌倒','滑倒','絆倒'],'重物壓砸/夾傷':['壓傷','砸','夾傷','壓住','掉落物'],
+const MOIAL={'機車/自行車事故':['機車','摩托車','腳踏車','自行車','單車','騎車'],'汽車事故':['汽車','開車','轎車','貨車'],'行人被撞':['行人','被車撞'],'墜落':['墜落','摔下','跌落','高處'],'跌倒（平地）':['跌倒','滑倒','絆倒','摔倒','自摔'],'重物壓砸/夾傷':['壓傷','砸','夾傷','壓住','掉落物'],
  '銳器傷':['割傷','刺傷','刀傷','刀割','菜刀','水果刀','切傷','被砍'],'鈍器/毆打':['毆打','打傷','被打','鈍器','被毆','被揍','家暴','拳頭','被踢'],'槍傷/爆炸':['槍','爆炸'],'燒燙傷':['燒傷','燙傷','燒燙'],'異物/化學物濺入':['異物','濺入','誤吞','吞入'],'動物咬傷':['咬傷','被狗咬','被貓咬'],'運動傷害':['打球','跑步','運動傷害']};
 const REGKW={'頭部/頭皮':['頭皮','頭部'],'臉部':['臉','顏面','面部','下巴','額頭','額'],'眼':['眼'],'耳':['耳'],'鼻':['鼻'],'口腔/牙齒':['牙','口腔','嘴','下顎','唇','舌'],'咽喉':['咽','喉'],'頸部':['頸'],'胸部':['胸','肋'],'腹部':['腹'],'骨盆/會陰':['骨盆','會陰'],'背部/脊椎':['背','脊椎','腰'],
  '上肢':['上肢','手','臂','肘','肩','腕','橈','尺骨','肱','鎖骨'],'下肢':['下肢','腿','膝','踝','足','腳','髖','脛','腓','跟','蹠'],'全身皮膚':['全身皮膚','多處擦傷']};
@@ -1116,7 +1133,7 @@ const ABCRX={'呼吸道':[['通暢可說話',/呼吸道通暢|可說話|言語�
 const SPEEDB=v=>v<30?'<30 km/h':v<=60?'30-60 km/h':'>60 km/h';
 const HEIGHTB=v=>v<2?'<2 m':v<=5?'2-5 m':'>5 m';
 
-const MOIEN={'機車/自行車事故':['motorcycle','scooter','bicycle','bike crash','motorbike'],'汽車事故':['car crash','car accident','mvc','motor vehicle'],'行人被撞':['pedestrian'],'墜落':['fall from','fell from','fall from height','fell off a'],'跌倒（平地）':['ground-level fall','slipped','tripped','fell down','fell on','fall on','falling onto','falling on','fall onto','fell onto','fell over'],'重物壓砸/夾傷':['crush','crushed','pinned','hit by a falling','struck by a falling','hit by falling','falling object','falling sign','caught in','caught between'],'銳器傷':['stab','stabbed','cut by','cut with','knife','blade','razor','sharp object'],'鈍器/毆打':['assault','assaulted','punched','struck with','hit by husband','hit by wife','hit by his','hit by her','hit by someone','hit by a person','hit by boyfriend','hit by girlfriend','hit by neighbor','beaten','beat up','kicked','domestic violence'],'槍傷/爆炸':['gunshot','blast','explosion'],'燒燙傷':['burn','scald'],'異物/化學物濺入':['foreign body','chemical splash','naoh','koh','alkali','bleach','acid splash','splash'],'動物咬傷':['bite','bitten'],'運動傷害':['sports','playing']};
+const MOIEN={'機車/自行車事故':['motorcycle','scooter','bicycle','bike crash','motorbike'],'汽車事故':['car crash','car accident','mvc','motor vehicle'],'行人被撞':['pedestrian'],'墜落':['fall from','fell from','fall from height','fell off a','fall from stairs','fall down stairs','fell down stairs'],'跌倒（平地）':['ground-level fall','slipped','tripped','fell down','fall down','falling down','slip down','slipped down','slipping','after falling','after a fall','falls down','fell over','fell on','fall on','falling onto','falling on','fall onto','fell onto','fell over'],'重物壓砸/夾傷':['crush','crushed','pinned','hit by a falling','struck by a falling','hit by falling','falling object','falling sign','caught in','caught between'],'銳器傷':['stab','stabbed','cut by','cut with','knife','blade','razor','sharp object'],'鈍器/毆打':['assault','assaulted','punched','struck with','hit by husband','hit by wife','hit by his','hit by her','hit by someone','hit by a person','hit by boyfriend','hit by girlfriend','hit by neighbor','beaten','beat up','kicked','domestic violence'],'槍傷/爆炸':['gunshot','blast','explosion'],'燒燙傷':['burn','scald'],'異物/化學物濺入':['foreign body','chemical splash','naoh','koh','alkali','bleach','acid splash','splash'],'動物咬傷':['bite','bitten'],'運動傷害':['sports','playing']};
 Object.assign(MOIAL,{'電焊/紫外線暴露':['電焊','焊接','雪盲','紫外線','電弧']});
 MOIAL['異物/化學物濺入']=[...MOIAL['異物/化學物濺入'],'魚刺','魚骨','魚鯁','鐵屑','沙子','卡在','卡到','濺到','噴濺','噴到','潑到'];
 Object.assign(MOIEN,{'電焊/紫外線暴露':['welding','welder','arc eye','flash burn','uv exposure','snow blindness']});
@@ -1128,7 +1145,7 @@ const FIND_AL={'耳痛':['耳痛','耳朵痛','ear pain','earache'],'畏光':['�
  '呼吸喘鳴':['stridor'],'角膜擦傷（螢光染色陽性）':['螢光染色陽性','fluorescein','corneal abrasion'],'鼻出血':['流鼻血','鼻血','nosebleed','epistaxis'],'耳漏':['耳漏','ear discharge'],'聽力下降':['聽不清','hearing loss'],'張口困難':['trismus']};
 const REGEN={'頭部/頭皮':['scalp','head','temple','occiput'],'臉部':['face','facial','chin','cheek','eyebrow','brow','forehead'],'眼':['eye'],'耳':['ear'],'鼻':['nose','nasal'],'口腔/牙齒':['tooth','teeth','mouth','jaw','lip','lips','tongue','gum','gums'],'咽喉':['throat'],'頸部':['neck'],'胸部':['chest','rib','ribs'],'腹部':['abdomen','abdominal'],'骨盆/會陰':['pelvis','perineum'],'背部/脊椎':['back','spine','lumbar','lower back','low back'],'上肢':['arm','forearm','elbow','shoulder','wrist','hand','finger','fingers','thumb','palm','upper limb','radi(?:us|al)','uln\\w+','humer\\w+','clavic\\w+','scaphoid','snuffbox','anatomical snuffbox','carpal\\w*'],'下肢':['leg','thigh','knee','ankle','foot','hip','heel','calf','shin','lower limb','malleol\\w*','calcane\\w+','tibi\\w+','fibul\\w+','metatars\\w+','toes?']};
 const SITEEN={'肩':['shoulder'],'上臂':['upper arm'],'肘':['elbow'],'前臂':['forearm'],'腕':['wrist','snuffbox','carpal','scaphoid'],'手':['hand','finger','fingers','thumb','palm'],'髖':['hip'],'大腿':['thigh'],'膝':['knee'],'小腿':['lower leg','calf','shin'],'踝':['ankle','malleol'],'足':['foot','toe']};
-const LIMBEN={'疑似骨折':['fracture'],'疑似脫位':['dislocation'],'腫脹':['swelling','swollen'],'變形':['deformity','deformed'],'撕裂傷':['laceration'],'擦傷':['abrasion'],'挫傷':['contusion','bruise','bruising','bruised','ecchymosis','ecchymoses','ecchymotic'],'活動受限':['limited range','restricted movement','unable to bear weight','cannot bear weight','unable to walk','limping'],'壓痛':['tenderness','tender to palpation'],'疼痛':['pain','painful'],'疑似扭傷':['sprain','sprained','twisted','rolled']};LIMBEN['撕裂傷']=['laceration','lacerated','cut','cuts'];LIMBEN['感覺或運動異常']=['numbness','numb','paresthesia','tingling','weakness'];
+const LIMBEN={'疑似骨折':['fracture'],'疑似脫位':['dislocation'],'腫脹':['swelling','swollen'],'變形':['deformity','deformed'],'撕裂傷':['laceration'],'擦傷':['abrasion'],'挫傷':['contusion','bruise','bruising','bruised','ecchymosis','ecchymoses','ecchymotic','hematoma','haematoma'],'活動受限':['limited range','restricted movement','unable to bear weight','cannot bear weight','unable to walk','limping'],'壓痛':['tenderness','tender to palpation'],'疼痛':['pain','painful'],'疑似扭傷':['sprain','sprained','twisted','rolled']};LIMBEN['撕裂傷']=['laceration','lacerated','cut','cuts'];LIMBEN['感覺或運動異常']=['weak','numbness','numb','paresthesia','tingling','weakness'];
 const ABCEN={'呼吸道':[['通暢可說話',/airway (?:is )?patent|patent airway|speaking in full/i]],'頸椎':[['已固定',/c-?collar|cervical collar|\bcollar\b/i]],'頸椎壓痛':[['無',/(?:no|without) (?:c-?spine|cervical|neck) tenderness/i],['有',/(?:c-?spine|cervical|neck) tenderness/i]],
  '呼吸音':[['雙側正常',/bilateral breath sounds (?:clear|equal|normal)|clear bilaterally|equal breath sounds/i],['左側減弱',/(?:decreased|diminished|reduced) breath sounds (?:on the |in the |at the )?left|left(?:-sided)? (?:decreased|diminished|reduced) breath sounds/i],['右側減弱',/(?:decreased|diminished|reduced) breath sounds (?:on the |in the |at the )?right|right(?:-sided)? (?:decreased|diminished|reduced) breath sounds/i],['雙側減弱',/(?:decreased|diminished|reduced) breath sounds bilaterally|bilateral(?:ly)? (?:decreased|diminished|reduced) breath sounds/i]],
  '外出血':[['無',/\b(?:no|without|denies?)\s+(?:(?:active|ongoing|external|obvious|gross|further|significant|massive|persistent)\s+)*(?:bleeding|hemorrhage)/i],['可控制',/bleeding (?:is )?controlled/i],['持續出血',/(?<!\bno )(?<!\bwithout )(?:ongoing|active|uncontrolled) bleeding/i]],'脈搏':[['橈動脈可觸及',/radial pulses? (?:palpable|present)|palpable radial/i],['無脈搏',/pulseless|no pulse/i]],'骨盆':[['不穩定',/pelvis (?:is )?unstable|unstable pelvis|pelvic instability/i],['穩定',/pelvis (?:is )?stable|(?<!un)stable pelvis|pelvis stable|pelvic ring stable/i]],
@@ -1147,6 +1164,7 @@ function ruleTr(t00){
  if(r.moi.includes('墜落')&&/fell (?:off|from) (?:the |a |his |her |their )?(?:bed|chair|couch|sofa|swing|stool|toilet|crib|changing table)|床上(?:摔|跌|掉)|從床|沙發(?:上)?(?:摔|跌|掉)/i.test(t)){r.moi=r.moi.filter(x=>x!=='墜落');if(!r.moi.includes('跌倒（平地）'))r.moi.push('跌倒（平地）')}
  const col=parseCollision(t);let colTarget=null;if(col){r.moi=r.moi.filter(x=>!['機車/自行車事故','汽車事故','行人被撞'].includes(x));r.moi.unshift(col.moi);colTarget=col['碰撞對象']}
  if(r.moi.includes('重物壓砸/夾傷')&&/falling (?:object|sign)|hit by (?:a )?falling|struck by (?:a )?falling|掉落物|被砸/i.test(t))r.moi=r.moi.filter(x=>x!=='跌倒（平地）'&&x!=='墜落');
+ if(r.moi.includes('機車/自行車事故')&&r.moi.includes('跌倒（平地）')&&/riding|rode|scooter|motorcycle|motorbike|bicycle|bike|騎/i.test(t))r.moi=r.moi.filter(x=>x!=='跌倒（平地）');
  if(r.moi.includes('行人被撞'))r.moi=r.moi.filter(x=>x!=='汽車事故'&&x!=='機車/自行車事故');
  if(!r.moi.some(x=>['機車/自行車事故','汽車事故','行人被撞'].includes(x))&&/\bTA\b|\bMVA\b|\bMVC\b|\bRTA\b|車禍|交通事故|traffic (?:accident|collision)/i.test(t))r.moi.unshift(/行人|pedestrian/i.test(t)?'行人被撞':/副駕|駕駛|後座|乘客|車內|\b(?:passenger|driver|rear seat|front seat|seat ?belt|car)\b|安全帶/i.test(t)?'汽車事故':'機車/自行車事故');
  const fbo=FBO.exec(t);if(fbo&&!r.moi.includes('異物/化學物濺入'))r.moi.push('異物/化學物濺入');
@@ -1156,17 +1174,17 @@ function ruleTr(t00){
    else if(m==='異物/化學物濺入'&&l==='部位'){const tl=t.toLowerCase();v=/食道|吞入|誤吞|吞下|swallow/i.test(t)?'食道/吞入':/喉|咽|throat|pharyn/i.test(t)?'咽喉':/眼|\beyes?\b/i.test(t)?'眼':/耳|\bear\b/i.test(t)?'耳':/鼻|\bnose\b|nasal/i.test(t)?'鼻':/skin|forehead|face|hand|arm|leg|foot|body|皮膚|臉|額|手|腿|腳/i.test(t)?'皮膚':null}
    else if(m==='異物/化學物濺入'&&l==='物質'){v=/電池|磁鐵|battery|magnet/i.test(t)?'電池或磁鐵':/化學|酸|鹼|漂白|chemical|acid|bleach|naoh|koh|alkali|caustic|ammonia/i.test(t)?'化學物':/魚刺|魚骨|魚鯁|骨頭|fish ?bone|bone/i.test(t)?'食物或骨頭':/玻璃|金屬|鐵屑|鐵絲|glass|metal|shard|iron/i.test(t)?'金屬或玻璃':/蟲|insect|bug/i.test(t)?'昆蟲':null}
    else if(l==='估計速度'){const s=t.match(/(\d+)\s*(?:km\/h|kph|公里|k\b)/i),mp=t.match(/(\d+)\s*mph/i);if(s)v=SPEEDB(+s[1]);else if(mp)v=SPEEDB(+mp[1]*1.6)}
-   else if(l==='高度'){if(!/fall|fell|jump|墜|摔|跌|跳/i.test(t))return;const t2=dropAgeSex(t),h=t2.match(/(\d+(?:\.\d+)?)\s*(?:公尺|米|m\b|meters?|metres?)/i),ft=t2.match(/(\d+(?:\.\d+)?)\s*(?:ft\b|feet|foot)/i),f=t2.match(/(\d+)\s*(?:樓|F\s*height|floor)/i)||t2.match(/(\d+)(?:st|nd|rd|th)?[- ]?(?:floor|stor(?:y|ey))/i);if(h)v=HEIGHTB(+h[1]);else if(t2.match(/(\d+(?:\.\d+)?)\s*(?:cm|公分)\b/i))v=HEIGHTB(+t2.match(/(\d+(?:\.\d+)?)\s*(?:cm|公分)\b/i)[1]/100);else if(ft)v=HEIGHTB(+ft[1]*0.3);else if(f)v=HEIGHTB((+f[1]-1)*3)}
+   else if(l==='高度'){if(!/fall|fell|jump|墜|摔|跌|跳/i.test(t))return;if(/\bstairs?\b|樓梯/i.test(t)&&!/\d\s*(?:m\b|公尺|米|cm|ft|feet|樓|floor)/i.test(t)){v='<2 m';d[l]=v;return}const t2=dropAgeSex(t),h=t2.match(/(\d+(?:\.\d+)?)\s*(?:公尺|米|m\b|meters?|metres?)/i),ft=t2.match(/(\d+(?:\.\d+)?)\s*(?:ft\b|feet|foot)/i),f=t2.match(/(\d+)\s*(?:樓|F\s*height|floor)/i)||t2.match(/(\d+)(?:st|nd|rd|th)?[- ]?(?:floor|stor(?:y|ey))/i);if(h)v=HEIGHTB(+h[1]);else if(t2.match(/(\d+(?:\.\d+)?)\s*(?:cm|公分)\b/i))v=HEIGHTB(+t2.match(/(\d+(?:\.\d+)?)\s*(?:cm|公分)\b/i)[1]/100);else if(ft)v=HEIGHTB(+ft[1]*0.3);else if(f)v=HEIGHTB((+f[1]-1)*3)}
    else if(l==='安全帽'){if(/(?:未|沒|無)(?:有)?戴安全帽|沒有安全帽|\b(?:no|without|not wearing|unhelmeted)\s+(?:a\s+)?helmet/i.test(t))v='未戴';else if(/(?:有)?戴(?:了)?安全帽|\bhelmet(?:ed)?\b/i.test(t))v='有戴'}
    else if(l==='安全帶'){if(/(?:未|沒|無)(?:有)?繫安全帶|沒有安全帶|未繫帶|unbelted|\b(?:no|without)\s+(?:a\s+)?seat ?belt/i.test(t))v='無';else if(/(?:有)?繫(?:了)?安全帶|\bbelted\b|seat ?belt (?:on|worn)|wearing (?:a )?seat ?belt/i.test(t))v='有'}
    else if(l==='拋飛或拖行'){if(/拋飛|飛出|\b(?:thrown|ejected from the (?:bike|motorcycle)|flew|launched)\b/i.test(t))v='拋飛';else if(/拖行|\bdragged\b/i.test(t))v='拖行'}
    else if(l==='彈出車外'){if(/彈出車外|ejected from (?:the )?(?:car|vehicle)/i.test(t))v='有'}
    else if(l==='角色'){if(/副駕|乘客|後座|\b(?:passenger|rear seat|back seat)\b/i.test(t))v=ops.find(o=>/乘客/.test(o));else if(/駕駛|騎士|騎車|\b(?:driver|rider|driving|riding)\b/i.test(t))v=ops[0]}
-   else if(l==='碰撞對象'){if(colTarget)v=colTarget;else if(/自摔|自己摔|self-?crash|lost control|\bskid(?:ded)?\b|fell off|single[- ]vehicle|\bsolo\b/i.test(t))v='自摔';else if(/大型車|\b(?:truck|bus|lorry)\b/i.test(t))v='大型車';else if(/汽車|\bcar\b/i.test(t))v='汽車';else if(/固定物|\b(?:pole|tree|guardrail|barrier)\b|(?:hit|into|against) (?:a |the )?wall/i.test(t))v='固定物'}
+   else if(l==='碰撞對象'){if(colTarget)v=colTarget;else if(/自摔|自己摔|self-?crash|lost control|\bskid(?:ded)?\b|fell off|falling down|fell down|fall down|slip(?:ped)? down|single[- ]vehicle|\bsolo\b/i.test(t))v='自摔';else if(/大型車|\b(?:truck|bus|lorry)\b/i.test(t))v='大型車';else if(/汽車|\bcar\b/i.test(t))v='汽車';else if(/固定物|\b(?:pole|tree|guardrail|barrier)\b|(?:hit|into|against) (?:a |the )?wall/i.test(t))v='固定物'}
    else{const tl=t.toLowerCase();const o=ops.find(x=>{if(x.length<2)return false;const i=idxOf(t,x,tl);return i>=0&&!isNeg(t,i)});if(o)v=o}
    if(v)d[l]=v});
   if(Object.keys(d).length)r.det[m]=d});
- if(/(?:無|沒有|否認)(?:意識喪失|昏迷|失去意識|昏倒)|\b(?:no|den(?:y|ied|ies)|without)\s+(?:loss of consciousness|I?LOC|syncope)\b/i.test(t))r.loc='無';else if(/意識喪失|昏迷|失去意識|\b(?:loss of consciousness|I?LOC|unconscious|passed out)\b/i.test(t))r.loc='有';
+ if(/\bconsciousness (?:was |is |remained |remains )?clear\b|\bclear consciousness\b|意識(?:清楚|清醒)|(?:無|沒有|否認)(?:意識喪失|昏迷|失去意識|昏倒)|\b(?:no|den(?:y|ied|ies)|without)\s+(?:loss of consciousness|I?LOC|syncope)\b/i.test(t))r.loc='無';else if(/意識喪失|昏迷|失去意識|\b(?:loss of consciousness|I?LOC|unconscious|passed out)\b/i.test(t))r.loc='有';
  r.hs={};[['失憶',['amnesia','失憶']],['噁心嘔吐',['N/V','nausea','vomit','vomiting','vomitting','噁心','嘔吐']],['嚴重頭痛',['severe headache','嚴重頭痛','劇烈頭痛']],['頭暈',['dizzy','dizziness','vertigo','頭暈']],['抽搐',['seizure','convulsion','抽搐']]].forEach(([k,al])=>{let h=hit(t,al);if(!h&&k==='嚴重頭痛'&&hit(t,['headache','頭痛'])===-1)h=-1;if(h)r.hs[k]=h});
  if(/(?:無|沒有|否認)(?:酒駕|喝酒|飲酒|酒精)|\b(?:no|denies)\s+(?:alcohol|ETOH|drinking)\b/i.test(t))r.alc='無';else if(/酒駕|喝酒|酒後|飲酒|\b(?:alcohol|intoxicated|drunk|ETOH)\b/i.test(t))r.alc='酒精';
  const EMSAL={'頸圈固定':['頸圈','c-collar','cervical collar','collar'],'背板固定':['背板','backboard','spine board'],'止血帶':['止血帶','tourniquet'],'加壓包紮':['加壓包紮','pressure dressing','pressure bandage'],'給氧':['給氧','氧氣','oxygen','O2'],'靜脈輸液':['輸液','點滴','IV fluids','IV access'],'骨盆束帶':['骨盆束帶','pelvic binder'],'夾板固定':['夾板','splint'],'現場心肺復甦':['CPR','心肺復甦']};
@@ -1179,11 +1197,15 @@ function ruleTr(t00){
  {const gi=t.search(/GCS|\bD\s*[:：]/i);if(gi>=0){const seg=t.slice(gi,gi+45),E=/(?<![A-Za-z])E\s*([1-4])(?!\d)/i.exec(seg),Vv=/(?<![A-Za-z])V\s*([1-5])(?!\d)/i.exec(seg),Mm=/(?<![A-Za-z])M\s*([1-6])(?!\d)/i.exec(seg);if(E&&Vv&&Mm)r.gcs={e:E[1],v:Vv[1],m:Mm[1]};else if(/GCS\s*[:：]?\s*15/i.test(seg))r.gcs={e:'4',v:'5',m:'6'}}
   if(!r.gcs){const gm=/GCS\s*[:：]?\s*(\d{1,2})(?![\d]|\s*[EVMevm]\s*\d)/i.exec(t);if(gm){const n=+gm[1];if(n===3)r.gcs={e:'1',v:'1',m:'1'};else if(n===15)r.gcs={e:'4',v:'5',m:'6'};else if(n>3&&n<15)r.note=(r.note?r.note+'；':'')+'GCS '+n}}}
  // 傷處
- const regIn=q=>Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
- const FINDW=/numbness|numb\b|paresthesia|tingling|麻|ecchymos\w*|bruis\w*|contusion|laceration|abrasion|swelling|swollen|deformity|fracture|tenderness|pain|瘀青|挫傷|擦傷|撕裂傷|腫|痛/i;
- let lastF='';const parts=[];
- t.split(/[，,。；;\n]|\.(?=\s|$)/).forEach(p0=>{const pcs=p0.split(/\s+and\s+|及|和|、/);const segs=pcs.length>1&&pcs.filter(regIn).length>1?pcs:[p0];
-  segs.forEach(p=>{const fm=FINDW.exec(p);if(fm){if(!isNeg(p,fm.index))lastF=fm[0];parts.push(p)}else parts.push(regIn(p)&&lastF?p+' '+lastF:p)})});
+ const regIn=q=>/\blimbs\b|\bextremities\b|四肢/i.test(q)||Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
+ const FINDW=/weakness|\bweak\b|numbness|numb\b|paresthesia|tingling|麻|ecchymos\w*|bruis\w*|contusion|laceration|abrasion|swelling|swollen|deformity|fracture|tenderness|pain|瘀青|挫傷|擦傷|撕裂傷|腫|痛/i;
+ let lastF='',pend=[];const parts=[];
+ t.split(/[，,。；;\n]|\.(?=\s|$)|\s+(?=\b(?:no|denied|denies|without)\s)/i).forEach(p0=>{const pcs=p0.split(/\s+and\s+|及|和|、/);const segs=pcs.length>1&&pcs.filter(regIn).length>1?pcs:[p0];
+  segs.forEach(p=>{const fm=FINDW.exec(p),hasNeg=/\b(?:no|not|denied|denies|without)\b|無|沒/i.test(p);
+   if(fm){if(!isNeg(p,fm.index)){lastF=fm[0];if(pend.length){pend.forEach(i=>{parts[i]+=' '+fm[0]});pend=[]}}}
+   else if(regIn(p)&&!hasNeg){if(lastF)p=p+' '+lastF;else pend.push(parts.length)}
+   const LMB=/\b(?:four\s+)?(?:limbs|extremities)\b|四肢/i;
+   if(LMB.test(p)&&!/upper|lower|\barms?\b|\blegs?\b|上肢|下肢/i.test(p)){parts.push(p.replace(LMB,'upper limb'),p.replace(LMB,'lower limb'))}else parts.push(p)})});
  const NEGREG=/(?:無|沒有)[^，。]{0,4}(?:壓痛|傷|異常)|正常|\b(?:non-?tender|no (?:tenderness|injury|deformity)|normal|unremarkable)\b/i;
  const ABNREG=/骨折|變形|腫|撕裂|擦傷|挫傷|血腫|\b(?:fracture|deform|swell|swollen|laceration|abrasion|contusion|bruis|hematoma|tender|pain|bleed)/i;
  let lastRg=null;
@@ -1226,16 +1248,18 @@ function ruleTr(t00){
  const inv={};TRCC.forEach(g=>g[1].forEach(x=>inv[x[1]]=x[0]));
  r.cc=Object.keys(r.reg).filter(k=>r.reg[k].st==='a').map(k=>inv[k]).filter(Boolean);
  r.pd=stripPd(parsePd(t));
- {const DEMO=/\b(?:y\/?o|yo|years?[- ]old|year-old|months?[- ]old|girl|boy|male|female|man|woman|child|patient)\b|歲|男童|女童|男性|女性|systemic|\bNKD?A\b|no known allerg|chronic|medical history|病史|過敏|健康|healthy|慢性|疾病|無病|^\s*GCS/i;let ccp='';
-  const cand=[];for(const s of prep(t0).split(/\n+|[。.;；]+(?=\s|$)/))for(const p of s.split(/[,，]/)){const q=p.trim().replace(/^\d{1,3}\s?(?:[MF]\b|\/\s?[MFmf]\b)[\s,]*/,'').replace(/^(?:chief complaint|cc|主訴)\s*[:：]?\s*/i,'');if(q.length>=3&&!DEMO.test(q)&&!/^(?:no|nil|den(?:y|ied|ies)|without|negative)\b/i.test(q)&&!/^(?:Px|PHx|Hx|PMH|Underlying|TOCC)\b/i.test(q)&&!/^[A-E]\s*[:：]/.test(q)&&!/\b(?:GCS|EFAST|FAST|pupils?|airway|breath sounds|pelvis (?:is )?stable)\b/i.test(q))cand.push(q)}
+ {const DEMO=/allerg|\b(?:y\/?o|yo|years?[- ]old|year-old|months?[- ]old|girl|boy|male|female|man|woman|child|patient)\b|歲|男童|女童|男性|女性|systemic|\bNKD?A\b|no known allerg|chronic|medical history|病史|過敏|健康|healthy|慢性|疾病|無病|^\s*GCS/i;let ccp='';
+  const cand=[];for(const s of prep(t0).split(/\n+|[。.;；]+(?=\s|$)/))for(const p of s.split(/[,，]/)){const q=p.trim().replace(/^\d{1,3}\s?(?:[MF]\b|\/\s?[MFmf]\b)[\s,]*/,'').replace(/^(?:chief complaint|cc|主訴)\s*[:：]?\s*/i,'').replace(/^(?:went to|came to|presented to|visited|brought to)\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b\s*(?:due to|because of|for|with|after)?\s*/i,'').replace(/\s*(?:came|went|presented|visited)\s+to\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b.*$/i,'');if(q.length>=3&&!DEMO.test(q)&&!/^(?:no|nil|den(?:y|ied|ies)|without|negative)\b/i.test(q)&&!/^(?:Px|PHx|Hx|PMH|Underlying|TOCC)\b/i.test(q)&&!/^[A-E]\s*[:：]/.test(q)&&!/\b(?:GCS|EFAST|FAST|pupils?|airway|breath sounds|pelvis (?:is )?stable)\b/i.test(q))cand.push(q)}
   const SYMW=/ecchym|bruis|contusion|pain|ache|swell|injur|deform|numb|tender|laceration|wound|bleed|burn|abrasion|contusion|sprain|fractur|痛|傷|腫|麻/i,MECHW=/\bTA\b|\bMVA\b|\bMVC\b|crash|accident|\bfall(?:ing)?\b|\bfell\b|slipped|tripped|struck|hit by|just now|scooter to|motor to/i,hasReg=q=>Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
   const TIMEW=/^(?:tonight|today|just now|this (?:morning|afternoon|evening)|yesterday|last night)$/i;
-  ccp=cand.find(q=>SYMW.test(q)&&hasReg(q)&&!MECHW.test(q))||cand.find(q=>SYMW.test(q)&&hasReg(q))||(r.cc.length?'':cand.find(q=>!TIMEW.test(q)&&!MECHW.test(q)&&/\bTA\b|\bMVA\b|\bMVC\b|pain|ache|injur|sprain|fractur|swell|lacerat|bleed|burn|bite|stab(?:bed|bing)?\b|crash|accident|fell|fall|struck|hit |stuck|swallow|foreign|splash|welding|hurt|痛|傷|腫|摔|撞|跌|扭|卡|咬|燒|血|異物/i.test(q))||'');
-  ccp=ccp.replace(/^with\s+/i,'').replace(/\s+(?:after|due to|since|when|following)\b.*$/i,'').trim();
+  const NEGQ=/\b(?:no|denied|denies|without|nil|negative)\b/i;
+  ccp=cand.find(q=>SYMW.test(q)&&hasReg(q)&&!MECHW.test(q)&&!NEGQ.test(q))||cand.find(q=>SYMW.test(q)&&hasReg(q)&&!NEGQ.test(q))||(r.cc.length?'':cand.find(q=>!TIMEW.test(q)&&!MECHW.test(q)&&/\bTA\b|\bMVA\b|\bMVC\b|pain|ache|injur|sprain|fractur|swell|lacerat|bleed|burn|bite|stab(?:bed|bing)?\b|crash|accident|fell|fall|struck|hit |stuck|swallow|foreign|splash|welding|hurt|痛|傷|腫|摔|撞|跌|扭|卡|咬|燒|血|異物/i.test(q))||'');
+  ccp=ccp.replace(/\s+(?:have|has|had|received|no|did not)\s+(?:\w+\s+){0,2}(?:tetanus|tdap)\b.*$/i,'').replace(/^with\s+/i,'').replace(/^(?:falling|fell|fall|slipp\w*)(?:\s+down)?\s+(?:with|and|then)\s+/i,'').replace(/\s+(?:after|due to|since|when|following|falling|fell|slipp\w+|this morning|yesterday|last night|today|just now)\b.*$/i,'').trim();
   if(ccp&&ccp.length<=80)addTo(r.oth,'tr.cc',ccp)}
  ruleBg(bodyOf(normPM(t00)),r,PMH,ALG);
+ ruleAnticoag(bodyOf(normPM(t00)),r);
  const ml=t.match(/(?:最後進食|最後吃|最近吃)\D{0,6}(\d+)\s*(小時|分鐘)前/);if(ml)r.meal=hhmm(new Date(Date.now()-(+ml[1])*(ml[2]==='小時'?60:1)*60000));
- if(/破傷風/.test(t)){if(/(?:10|十)\s*年內/.test(t)&&!/未|沒/.test(t.match(/破傷風[^，。]*/)[0]))r.teta='10 年內曾接種';else if(/(?:未|沒)[^，。]{0,3}(?:打|接種)|不詳/.test(t))r.teta='超過 10 年或不詳'}
+ {const tv=parseTeta(t,r);if(tv)r.teta=tv}
  ruleDx(t0,r,DXTR);return r}
 
 /* ---------- AI 解析 ---------- */
@@ -1386,7 +1410,7 @@ function autoMode(t){if(NL.dept){if(S.mode!==NL.dept)setMode(NL.dept);return}con
  if(d==='tr')m='tr';else if(d==='pd'&&S.mode==='nt')m='pd';else if(d==='adult'&&S.mode==='pd')m='nt';
  if(m===S.mode)return;setMode(m);
  toast(m==='tr'?Z('內容像外傷，已切換到外傷病歷','Looks like trauma. Switched to the trauma chart.'):m==='pd'?Z('內容像小兒個案，已切換到小兒病歷','Looks like a pediatric case. Switched to the pediatric chart.'):Z('已切換到非外傷病歷','Switched to the non-trauma chart.'))}
-const TRAUMA_RE=/\bTA\b|滑倒|\bsuture\b|plasty|ecchymos\w*|\bwound\b|\bcut\b|knife|\bhit by\b|被打|被砍|\bkicked\b|\bpunched\b|\bMVA\b|\bs\/p fall|\bslipped\b|\blaceration\b|\babrasion\b|\bcontusion\b|扭傷|扭到|拉傷|骨折|脫臼|挫傷|擦傷|撕裂傷|\b(?:sprain(?:ed)?|fracture[ds]?|dislocat\w+|contusion|bruis\w+|abrasion)\b|塞進|塞入|塞到|珠子|豆子|車禍|機車|自摔|撞|墜落|摔|跌倒|跌落|割傷|刺傷|砍|燒燙|燙傷|咬傷|外傷|壓傷|砸|爆炸|槍|魚刺|魚骨|魚鯁|異物|電焊|焊接|雪盲|紫外線|濺入|濺到|卡到|卡在|吞入|誤吞|鐵屑|\b(?:crash|collision|mvc|accident|fell|fall from|ground-level fall|stab(?:bed)?|laceration|burn(?:ed)?|scald|bite[nd]?|bitten|assault(?:ed)?|gunshot|blast|trauma|injur(?:y|ed)|crush(?:ed)?|struck|thrown|ejected|fish ?bone|foreign body|welding|welder|arc eye|flash burn|snow blindness|splash(?:ed)?|swallowed|stuck in)\b/i;
+const TRAUMA_RE=/\bTA\b|\bfalling\b|\bfall(?:s)? (?:from|down|on|onto)\b|\bslipping\b|\bslip(?:ped)? down\b|after (?:a )?fall|contus\w*|\bL\/W\b|\bA\/W\b|hematoma|滑倒|\bsuture\b|plasty|ecchymos\w*|\bwound\b|\bcut\b|knife|\bhit by\b|被打|被砍|\bkicked\b|\bpunched\b|\bMVA\b|\bs\/p fall|\bslipped\b|\blaceration\b|\babrasion\b|\bcontusion\b|扭傷|扭到|拉傷|骨折|脫臼|挫傷|擦傷|撕裂傷|\b(?:sprain(?:ed)?|fracture[ds]?|dislocat\w+|contusion|bruis\w+|abrasion)\b|塞進|塞入|塞到|珠子|豆子|車禍|機車|自摔|撞|墜落|摔|跌倒|跌落|割傷|刺傷|砍|燒燙|燙傷|咬傷|外傷|壓傷|砸|爆炸|槍|魚刺|魚骨|魚鯁|異物|電焊|焊接|雪盲|紫外線|濺入|濺到|卡到|卡在|吞入|誤吞|鐵屑|\b(?:crash|collision|mvc|accident|fell|fall from|ground-level fall|stab(?:bed)?|laceration|burn(?:ed)?|scald|bite[nd]?|bitten|assault(?:ed)?|gunshot|blast|trauma|injur(?:y|ed)|crush(?:ed)?|struck|thrown|ejected|fish ?bone|foreign body|welding|welder|arc eye|flash burn|snow blindness|splash(?:ed)?|swallowed|stuck in)\b/i;
 async function runAi(){const t=S.nl.trim();if(!t){NL.msg=Z('請先輸入文字。','Please enter some text first.');renderNL();return}if(!SMP)return;
  autoMode(t);
  nlCtl=new AbortController();NL.busy=true;NL.msg=Z('AI 解析中…','AI is parsing…');renderNL();
