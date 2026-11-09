@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
 <title>急診結構化病歷</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
@@ -321,14 +322,14 @@ const ABCDE=[
 const ABC_REQ=['呼吸道','頸椎','呼吸音','外出血','脈搏','eFAST','瞳孔','肢體活動'];
 const LIMB={f:['擦傷','挫傷','撕裂傷','疑似骨折','疑似脫位','變形','腫脹','活動受限','無法負重','疼痛','壓痛','疑似扭傷','開放性傷口','遠端脈搏減弱','感覺或運動異常'],side:['左','右']};
 const REG={
- '頭部/頭皮':{f:['頭皮撕裂傷','頭皮血腫','顱骨凹陷','顱底骨折徵象（浣熊眼/Battle 徵象）','耳鼻出血或腦脊髓液漏','疼痛','挫傷','擦傷']},
+ '頭部/頭皮':{f:['壓痛','頭皮撕裂傷','頭皮血腫','顱骨凹陷','顱底骨折徵象（浣熊眼/Battle 徵象）','耳鼻出血或腦脊髓液漏','疼痛','挫傷','擦傷']},
  '臉部':{f:['面骨壓痛','牙齒斷裂','眼周瘀青','鼻出血或鼻骨變形','臉部撕裂傷','疼痛','挫傷','擦傷']},
  '眼':{side:['左','右','雙側'],sites:[],f:['視力下降','眼瞼撕裂傷','疑似眼球破裂','角膜擦傷（螢光染色陽性）','前房出血','結膜下出血','瞳孔變形','眼窩周圍瘀青','眼球運動受限','眼內異物','化學灼傷','畏光','流淚','眼睛疼痛','異物感']},
  '耳':{side:['左','右','雙側'],sites:[],f:['耳痛','耳廓撕裂傷','耳廓血腫','外耳道出血','耳膜穿孔','聽力下降','耳後瘀青（Battle 徵象）','耳內異物']},
  '鼻':{f:['鼻出血','鼻骨變形','鼻骨壓痛','鼻中隔血腫','腦脊髓液鼻漏','鼻內異物']},
  '口腔/牙齒':{f:['牙齒斷裂','牙齒脫位或脫落','口唇撕裂傷','牙齦撕裂傷','舌或口腔撕裂傷','下頜壓痛或咬合不正','張口困難','口內持續出血']},
  '咽喉':{f:['異物感','吞嚥疼痛','聲音沙啞','皮下氣腫','呼吸喘鳴','流口水','可見異物']},
- '頸部':{f:['頸椎中線壓痛','氣管偏移','皮下氣腫','頸部血腫','穿刺傷','疼痛','挫傷','擦傷']},
+ '頸部':{f:['壓痛','頸椎中線壓痛','氣管偏移','皮下氣腫','頸部血腫','穿刺傷','疼痛','挫傷','擦傷']},
  '胸部':{f:['胸壁壓痛','肋骨壓痛','胸壁挫傷','皮下氣腫','反常呼吸','穿刺傷','呼吸音減弱','疼痛','擦傷']},
  '腹部':{f:['腹部壓痛','反彈痛','腹部僵硬','腹脹','安全帶痕','穿刺傷','疼痛','挫傷','擦傷']},
  '骨盆/會陰':{f:['骨盆擠壓痛','骨盆不穩定','會陰血腫','尿道口出血','直腸出血','疼痛']},
@@ -942,7 +943,7 @@ const CCAL={'腹痛':['腹痛','肚子痛','胃痛'],'腹瀉':['腹瀉','拉肚�
  '高血壓/血糖異常':['血壓高','血糖高','血糖異常'],'小兒發燒':['小兒發燒','小孩發燒'],'吐血/解黑便':['吐血','黑便'],'意識改變':['意識改變','意識不清','嗜睡','昏迷']};
 Object.assign(CCAL,{'小兒發燒':['發燒','發熱'],'小兒咳嗽/喘鳴':['咳嗽','喘鳴','哮吼','呼吸急促'],'小兒嘔吐/腹瀉':['嘔吐','腹瀉','拉肚子'],'小兒腹痛':['腹痛','肚子痛'],'熱性痙攣/抽搐':['抽搐','痙攣'],'小兒皮疹':['皮疹','紅疹'],'小兒耳鼻喉不適':['耳痛','流鼻水','鼻塞','喉嚨痛'],'哭鬧不安/易怒':['哭鬧','易怒','不安'],'進食不良/脫水':['進食不良','脫水','不肯喝','喝水減少'],'誤食/中毒（小兒）':['誤食','吞入','中毒']});
 Object.assign(CCEN,{'小兒發燒':['fever','febrile'],'小兒咳嗽/喘鳴':['cough','wheez','stridor','croup','bronchiolitis'],'小兒嘔吐/腹瀉':['vomiting','diarrhea','gastroenteritis'],'小兒腹痛':['abdominal pain','belly pain','stomach ache'],'熱性痙攣/抽搐':['seizure','convulsion','febrile seizure'],'小兒皮疹':['rash','hives'],'小兒耳鼻喉不適':['ear pain','earache','nasal congestion','runny nose','sore throat'],'哭鬧不安/易怒':['irritab','inconsolable','crying','fussy'],'進食不良/脫水':['poor feeding','dehydrat','not drinking','decreased intake'],'誤食/中毒（小兒）':['ingest','swallowed','overdose','poison']});
-Object.assign(CCEN,{'腹痛':[...(CCEN['腹痛']||[]),'abd pain','abdominal cramping','abdominal cramp','epigastric pain','periumbilical pain','RUQ pain','RLQ pain','LLQ pain','LUQ pain','lower abdominal pain','stomachache','tummy ache','abodminal pain'],
+Object.assign(CCEN,{'腹痛':[...(CCEN['腹痛']||[]),'abd pain','abdominal cramping','abdominal cramp','epigastric pain','periumbilical pain','RUQ pain','RLQ pain','LLQ pain','LUQ pain','lower abdominal pain','stomachache','tummy ache','abodminal pain','epigatric pain','abdominal distention','abdominal distension','abdominal fullness','abdomen fullness','abdominal discomfort','abdominal bloating','epigastric discomfort','abdominal cramps','belly ache','abdomen pain','lower abdomen pain'],
  '噁心嘔吐':[...(CCEN['噁心嘔吐']||[]),'vomit','vomitting','nausea','N/V'],'呼吸困難':[...(CCEN['呼吸困難']||[]),'SOB','dyspena','dyspnoea','breathlessness'],'頭暈':[...(CCEN['頭暈']||[]),'dizzy','giddiness']});
 const SYMAL={'冒冷汗':['冒冷汗','出冷汗','冷汗'],'呼吸困難':['呼吸困難','喘不過氣','呼吸急促'],'噁心':['噁心','想吐'],'放射至左手':['放射至左手','放射到左手','痛到左手','左手麻','左臂'],'放射至下顎':['放射至下顎','痛到下巴','下顎'],
  '放射至背部':['放射至背部','放射到背','痛到背'],'心悸':['心悸','心跳很快','心跳加速'],'暈厥':['暈厥','昏倒','暈倒'],'咳嗽':['咳嗽'],'隨呼吸加重':['隨呼吸加重','深呼吸會痛','吸氣會痛'],'隨活動加重':['隨活動加重','活動會加重','運動時加重','爬樓梯'],
@@ -956,6 +957,167 @@ const SOCAL={'抽菸':['抽菸','吸菸'],'喝酒':['喝酒','飲酒','酒精'],
 const PEAL={'一般外觀':['一般外觀','外觀'],'頭頸':['頭頸'],'眼':['眼睛','眼'],'耳鼻喉':['耳鼻喉','咽喉'],'心臟':['心臟','心音','心律'],'胸/肺':['肺','呼吸音','胸部'],'腹部':['腹部'],'背部/脊椎':['背部','脊椎'],'骨骼肌肉':['骨骼肌肉'],'四肢':['四肢'],'神經':['神經'],'皮膚':['皮膚'],'泌尿生殖/婦科':['泌尿生殖','婦科'],'精神狀態':['精神狀態']};
 const PE_AL={'腹部壓痛':['abdominal tenderness','LLQ tenderness','LUQ tenderness','RUQ tenderness','suprapubic tenderness','flank tenderness','tender abdomen','tenderness over LLQ','tenderness over LUQ','tenderness over RUQ','tenderness over RLQ','tenderness over the abdomen','tenderness over left flank','tenderness over right flank','tenderness over suprapubic','tenderness over epigastric','tenderness at the abdomen','tenderness at RLQ','tenderness at RUQ','tenderness at LLQ','tenderness at LUQ','tenderness at suprapubic'],'右下腹壓痛':['RLQ tenderness','RLQ pain','right lower quadrant pain'],'上腹壓痛':['epigastric tenderness','epigastric pain','tenderness at epigastric','tenderness in epigastric','tenderness over the epigastric','epigastric region tenderness','tender epigastrium','epigastrium tenderness'],'CVA 敲痛':['CVA tenderness','costovertebral angle tenderness'],'反彈痛':['rebound','rebound pain','rebound tenderness'],'腹部僵硬':['rigid abdomen','abdominal rigidity','guarding','muscle guarding','involuntary guarding','board-like abdomen','rigidity'],'心雜音':['murmur','murmurs'],'囉音 (rales)':['rales','crackles'],'哮鳴 (wheeze)':['wheeze','wheezing'],'頸部僵硬':['neck stiffness','nuchal rigidity','stiff neck'],'單側無力':['focal weakness','hemiparesis'],'顏面不對稱':['facial droop','facial asymmetry']};
 const PEEN={'心臟':['heart','cardiac','cardiovascular'],'胸/肺':['lungs','lung','chest','breath sounds','respiratory'],'腹部':['abdomen','abdominal'],'神經':['neuro','neurologic','neurological'],'一般外觀':['general','general appearance'],'皮膚':['skin'],'四肢':['extremities'],'頭頸':['head and neck','heent'],'耳鼻喉':['ent','throat','oropharynx']};
+/* ===== 內科擴充範本：依急診內科病歷常見主訴新增（尿滯留、腹脹、水腫、食慾不振、過度換氣、轉診入院評估）；肢體疼痛補別名 ===== */
+(()=>{
+const add=(cat,n,icd,o)=>{const t=T(cat,n,icd,o);TPL.push(t);TP[n]=t;t.dx.forEach(d=>{DXNT[d[0]]=d[1]})};
+add('泌尿/婦科','尿滯留/解尿困難','R33.9',{loc:['下腹','會陰','腰側'],q:['脹痛','悶痛','刺痛'],
+ sym:['下腹脹痛','尿流變細或解尿費力','尿量減少','血尿','解尿疼痛','頻尿','漏尿或溢尿','發燒','腰痛','便秘','噁心嘔吐','下肢無力或麻木','近期換或拔尿管','新開藥物或調整劑量'],
+ ext:[['最後一次解尿時間','time'],['導尿量（mL）','num'],['導尿管','sel',['無','長期留置','近期更換','近期拔除']]],
+ pe:['腹部','泌尿生殖/婦科','背部/脊椎','神經'],
+ dx:['尿滯留|R33.9','泌尿道感染|N39.0','攝護腺肥大|N40.1','導尿管阻塞或功能異常|T83.098A','急性腎損傷|N17.9','輸尿管結石|N20.1','肉眼血尿|R31.0','便秘|K59.00','神經性膀胱|N31.9']});
+add('腹部','腹脹','R14.0',{loc:['上腹','下腹','全腹','右側腹','左側腹'],q:['脹氣','脹痛','腹圍增加'],
+ sym:['噁心嘔吐','便秘','腹瀉','停止排氣排便','腹痛','發燒','食慾不振','體重減輕','黃疸','黑便或血便','下肢水腫','呼吸困難','尿量減少','打嗝或噯氣'],
+ ext:[['腹脹天數','num'],['最後排便時間','time'],['最後排氣時間','time']],
+ pe:['腹部','胸/肺','四肢','一般外觀'],
+ dx:['腹水|R18.8','腸阻塞|K56.60','便秘|K59.00','急性腸胃炎|A09','腸脹氣|R14.0','急性胰臟炎|K85.90','尿滯留|R33.9','消化不良|K30','腹膜炎|K65.9']});
+add('心肺','水腫（下肢/全身）','R60.9',{loc:['雙下肢','單側下肢','臉部/眼周','全身','手部','陰囊/會陰'],side:true,q:['凹陷性','非凹陷性'],
+ sym:['呼吸困難','端坐呼吸','夜間陣發性呼吸困難','體重增加','尿量減少','泡沫尿','胸痛','腹脹','發燒','局部紅熱痛','咳嗽','噁心嘔吐','近期長途旅行或臥床','新藥物（鈣離子阻斷劑/NSAID/類固醇）','高鹽飲食或漏服藥'],
+ ext:[['水腫天數','num'],['體重增加（kg）','num'],['尿量變化','sel',['正常','減少','明顯減少']]],
+ pe:['四肢','心臟','胸/肺','腹部','皮膚'],
+ dx:['急性心衰竭|I50.9','慢性腎臟病|N18.9','腎病症候群|N04.9','腹水|R18.8','深部靜脈栓塞|I82.409','蜂窩性組織炎|L03.90','靜脈功能不全|I87.2','低白蛋白血症|E88.09','藥物副作用|T88.7XXA','急性腎損傷|N17.9','水腫 原因未明|R60.9']});
+add('全身','食慾不振','R63.0',{
+ sym:['噁心嘔吐','腹痛','腹瀉','便秘','發燒','體重減輕','吞嚥困難或疼痛','口腔潰瘍或牙痛','咳嗽','全身無力','黑便或血便','解尿疼痛','情緒低落或失眠','尿量減少','新開藥物或調整劑量','頭暈','黃疸'],
+ ext:[['持續天數','num'],['進食/喝水','sel',['正常','減少','明顯減少或拒食']],['體重變化','text']],
+ pe:['一般外觀','腹部','耳鼻喉','胸/肺','精神狀態'],
+ dx:['食慾不振|R63.0','脫水|E86.0','急性腸胃炎|A09','泌尿道感染|N39.0','肺炎|J18.9','上呼吸道感染|J06.9','電解質異常|E87.8','憂鬱|F32.9','消化性潰瘍|K27.9','藥物副作用|T88.7XXA','貧血|D64.9']});
+add('心肺','過度換氣','R06.4',{
+ sym:['手腳麻木','口周麻木','手腳痙攣（手足搐搦）','胸悶','胸痛','心悸','頭暈','呼吸困難','焦慮或恐慌','近期壓力事件','暈厥','發燒','咳嗽','酒精或藥物使用'],
+ ext:[['發作持續時間','text'],['過去類似發作','sel',['無','有','不詳']]],
+ pe:['一般外觀','胸/肺','心臟','神經','精神狀態'],
+ dx:['過度換氣|R06.4','恐慌發作|F41.0','急性焦慮|F41.0','氣喘/COPD 急性發作|J44.1','肺栓塞|I26.99','氣胸|J93.9','急性冠心症 (ACS)|I24.9','糖尿病酮酸中毒|E11.10','呼吸性鹼中毒|E87.3']});
+add('全身','轉診/入院評估','Z76.89',{
+ sym:['發燒','胸痛','呼吸困難','腹痛','意識改變','出血','抽搐','噁心嘔吐','疼痛控制','症狀惡化','家屬或病人要求住院'],
+ ext:[['轉診原因','sel',['進一步檢查或處置','需加護病房','手術或介入評估','專科會診','病況惡化','家屬要求','其他']],['轉出院所','text'],['轉診診斷','text'],['外院檢查結果','text'],['外院已給予處置','text'],['到院方式','sel',['救護車','自行就醫','家屬送']]],
+ pe:['一般外觀','心臟','胸/肺','腹部','神經'],
+ dx:['非ST上升心肌梗塞 (NSTEMI)|I21.4','ST上升心肌梗塞 (STEMI)|I21.3','肺炎|J18.9','敗血症|A41.9','缺血性腦中風|I63.9','腸阻塞|K56.60','上消化道出血|K92.2','急性心衰竭|I50.9','急性腎損傷|N17.9','轉診評估|Z76.89']});
+
+/* 既有「肢體疼痛/腫脹（非外傷）」補症狀 */
+{const t=TP['肢體疼痛/腫脹（非外傷）'];['活動受限','夜間痛','皮膚破損或傷口'].forEach(s=>{if(!t.sym.includes(s))t.sym.push(s)})}
+
+/* 主訴別名（中文／英文縮寫與常見寫法） */
+Object.assign(CCAL,{
+ '尿滯留/解尿困難':['尿滯留','解尿困難','解不出尿','尿不出','尿不出來','解尿費力','無尿','少尿'],
+ '腹脹':['腹脹','肚子脹','脹氣'],
+ '水腫（下肢/全身）':['水腫','浮腫','腳水腫','下肢水腫','雙腳腫'],
+ '食慾不振':['食慾不振','沒胃口','吃不下','胃口差','食慾差','進食減少','不想吃'],
+ '過度換氣':['過度換氣','換氣過度'],
+ '轉診/入院評估':['轉診','轉來','轉入','診所轉','醫院轉','外院轉','轉院','入院評估'],
+ '肢體疼痛/腫脹（非外傷）':['肢體疼痛','四肢痛','手腳痛','腳痛','腿痛','手痛','膝蓋痛','手臂痛','下肢痛','上肢痛','肢體腫脹']});
+Object.assign(CCEN,{
+ '尿滯留/解尿困難':['urinary retention','urine retention','urinary retension','retention of urine','difficulty urinating','difficulty voiding','difficulty in urination','unable to void','unable to urinate','cannot urinate',"can't urinate",'voiding difficulty','voiding hesitancy','anuria','oliguria','decreased urine output','decreased urine amount'],
+ '腹脹':['abdominal distension','abdominal distention','abdominal bloating','abdominal fullness','abd distension','abd fullness','bloating','bloated','distended abdomen','abdominal swelling','epigastric bloating','epigastric fullness','belly bloating'],
+ '水腫（下肢/全身）':['leg edema','legs edema','limbs edema','limb edema','pitting edema','bilateral edema','bilateral leg swelling','bilateral lower limb swelling','bilateral lower limbs swelling','bilateral foot swelling','bilateral foot edema','bilateral lower leg swelling','periorbital edema','facial edema','anasarca','generalized edema','body weight gain','weight gain'],
+ '食慾不振':['poor appetite','loss of appetite','appetite loss','decreased appetite','reduced appetite','anorexia','poor oral intake','poor intake','decreased oral intake','decreased intake','poor PO','poor food intake','poor eating','not eating'],
+ '過度換氣':['hyperventilation','hyperventilating','hyperventilate','over-breathing','overbreathing','fast breathing'],
+ '轉診/入院評估':['transfer from','transferred from','transfered from','referred from','refer from','refered from','referred for','refer for','refered for','referral','for admission','ask for admission','admission evaluation','sent by LMD'],
+ '肢體疼痛/腫脹（非外傷）':['limbs pain','limb pain','extremity pain','extremities pain','leg pain','legs pain','arm pain','hand pain','foot pain','knee pain','thigh pain','calf pain','shoulder pain','elbow pain','wrist pain','ankle pain','lower limb pain','upper limb pain','limb swelling','limbs swelling','leg swelling','lower leg swelling','lower limb swelling','lower limbs swelling','foot swelling']});
+
+/* 既有主訴補常見英文寫法（從內科病歷找到的漏網寫法） */
+const more=(o)=>{for(const k in o)CCEN[k]=[...new Set([...(CCEN[k]||[]),...o[k]])]};
+more({'腹痛':['abdomen pain','abdomen discomfort','abdominal discomfort','abd discomfort','abdomianl pain','abodminal pain','lower abdomen pain','upper abdomen pain','left side abdomen pain','right side abdomen pain'],
+ '背痛':['flank pain','low back pain','lumbago','backache','back soreness'],
+ '吐血/解黑便':['bloody stool','tarry stool','black stool','hematochezia','blood in stool'],
+ '高血壓/血糖異常':['hypoglycemia','high blood pressure','elevated blood pressure','high BP'],
+ '單側無力/言語不清':['left side weakness','right side weakness','left sided weakness','right sided weakness','facial deviation','facial palsy'],
+ '尿滯留/解尿困難':['urinary difficulty','urination difficulty','dysuria with retention','unable to pass urine','no urine output'],
+ '肢體疼痛/腫脹（非外傷）':['joint pain','finger pain','toe pain','hip pain']});
+/* 症狀別名（只補新增症狀；既有症狀沿用原本比對） */
+Object.assign(SYMAL,{
+ '下腹脹痛':['下腹脹','suprapubic pain','suprapubic fullness','suprapubic distension','bladder distension','lower abdominal distension'],
+ '尿流變細或解尿費力':['尿流變細','解尿費力','解尿無力','weak stream','hesitancy','voiding hesitancy','straining to void'],
+ '尿量減少':['尿量減少','尿少','decreased urine output','decreased urine amount','decreased U/O','oliguria'],
+ '漏尿或溢尿':['漏尿','溢尿','urine leakage','overflow incontinence','dribbling','leakage from foley','leaking from foley'],
+ '近期換或拔尿管':['換尿管','拔尿管','foley change','changed foley','foley removal','foley exchange','catheter change','exchange of foley'],
+ '下肢無力或麻木':['下肢無力','下肢麻木','lower limb weakness','lower limbs weakness','leg weakness','lower limb numbness','leg numbness'],
+ '打嗝或噯氣':['打嗝','噯氣','belching','burping','hiccup'],
+ '停止排氣排便':['停止排氣','無排氣','no flatus','no gas passage','obstipation','no stool or flatus'],
+ '黑便或血便':['黑便','血便','tarry stool','melena','bloody stool','hematochezia'],
+ '端坐呼吸':['端坐呼吸','orthopnea','orthopnoea'],
+ '夜間陣發性呼吸困難':['夜間陣發性呼吸困難','夜間喘','PND','paroxysmal nocturnal dyspnea'],
+ '體重增加':['體重增加','weight gain','body weight gain','gain weight'],
+ '體重減輕':['體重減輕','體重下降','weight loss','body weight loss','BW loss'],
+ '泡沫尿':['泡沫尿','foamy urine'],
+ '局部紅熱痛':['紅熱痛','紅腫','redness','erythema','warmth'],
+ '近期長途旅行或臥床':['長途旅行','臥床','bedridden','bed-ridden','long travel','long-distance travel'],
+ '新藥物（鈣離子阻斷劑/NSAID/類固醇）':['amlodipine','NSAID','steroid','prednisolone','steroids'],
+ '高鹽飲食或漏服藥':['高鹽','漏藥','miss medication','poor compliance','non-compliance','noncompliance'],
+ '吞嚥困難或疼痛':['吞嚥困難','吞嚥疼痛','dysphagia','odynophagia','swallowing pain'],
+ '口腔潰瘍或牙痛':['口腔潰瘍','牙痛','oral ulcer','mouth ulcer','toothache','tooth pain'],
+ '情緒低落或失眠':['情緒低落','失眠','insomnia','depressed mood','poor sleep'],
+ '全身無力':['全身無力','general weakness','generalized weakness','malaise','fatigue'],
+ '手腳麻木':['手腳麻','手麻','腳麻','四肢麻','limbs numbness','limb numbness','four limbs numbness','hand numbness','extremity numbness','paresthesia','tingling'],
+ '口周麻木':['口周麻','perioral numbness','perioral tingling','lip numbness'],
+ '手腳痙攣（手足搐搦）':['手腳抽筋','手抽筋','手足搐搦','手腳痙攣','carpopedal spasm','four limbs spasm','limbs spasm','tetany','hand cramp'],
+ '焦慮或恐慌':['焦慮','恐慌','panic','anxiety','anxious'],
+ '近期壓力事件':['壓力','吵架','stress','conflict','argument','quarrel'],
+ '胸悶':['胸悶','chest tightness','chest discomfort'],
+ '出血':['出血','bleeding','hemorrhage','hemoptysis'],
+ '疼痛控制':['疼痛控制','止痛','pain control','analgesic'],
+ '症狀惡化':['惡化','worsening','deteriorat','exacerbat'],
+ '家屬或病人要求住院':['要求住院','要求入院','ask for admission','requested admission','request admission'],
+ '活動受限':['活動受限','limited ROM','limitation of motion','limit ROM'],
+ '夜間痛':['夜間痛','night pain','pain at night'],
+ '皮膚破損或傷口':['皮膚破損','傷口','wound','skin break','abrasion']});
+/* 新增理學檢查項目 */
+const pe=(s,a)=>a.forEach(x=>{if(!SYS[s].includes(x))SYS[s].push(x)});
+pe('腹部',['腹水徵象（移動性濁音）','鼓音','膀胱脹（恥骨上飽滿）','腸音亢進']);
+pe('四肢',['凹陷性水腫','雙側下肢水腫','單側肢體腫脹','肢體發紅發熱']);
+pe('泌尿生殖/婦科',['膀胱脹（恥骨上飽滿）','攝護腺腫大','導尿管阻塞或血塊']);
+pe('神經',['手足痙攣 (carpopedal spasm)']);
+pe('一般外觀',['呼吸急促','焦慮貌','消瘦']);
+Object.assign(PE_AL,{
+ '腹水徵象（移動性濁音）':['shifting dullness','ascites','fluid wave','移動性濁音'],
+ '鼓音':['tympanic','tympanic sound','tympanic percussion','hyperresonance','鼓音'],
+ '膀胱脹（恥骨上飽滿）':['distended bladder','bladder distension','suprapubic fullness','palpable bladder','suprapubic distension','膀胱脹'],
+ '腸音亢進':['hyperactive bowel sound','hyperactive bowel sounds','increased bowel sound','腸音亢進'],
+ '凹陷性水腫':['pitting edema','pitting oedema','pitting','凹陷性水腫'],
+ '雙側下肢水腫':['bilateral leg edema','bilateral lower limb edema','bilateral pitting edema','bil leg edema','bilateral foot edema','bilateral edema','legs edema','雙下肢水腫','雙側下肢水腫'],
+ '單側肢體腫脹':['unilateral leg swelling','unilateral swelling','right leg swelling','left leg swelling','單側腫脹'],
+ '肢體發紅發熱':['redness','erythema','warmth','heatness','紅熱'],
+ '攝護腺腫大':['enlarged prostate','prostate enlargement','prostate enlarged','攝護腺腫大'],
+ '導尿管阻塞或血塊':['clot retention','blood clot','blood clots','foley obstruction','foley blocked','foley blockage'],
+ '手足痙攣 (carpopedal spasm)':['carpopedal spasm','tetany','手足搐搦'],
+ '呼吸急促':['tachypnea','tachypnoea','rapid respiratory rate','rapid breathing'],
+ '焦慮貌':['anxious','anxiety','nervous','agitated','焦慮'],
+ '消瘦':['cachexia','cachectic','emaciated','消瘦']});
+/* 快速組合 */
+Object.assign(PACK,{
+ '尿滯留/解尿困難':[['攝護腺肥大/尿滯留樣',{loc:['下腹'],sym:{'下腹脹痛':1,'尿流變細或解尿費力':1,'發燒':-1,'血尿':-1,'腰痛':-1},pe:{'腹部':['膀胱脹（恥骨上飽滿）'],'泌尿生殖/婦科':['攝護腺腫大']}}],
+  ['導尿管阻塞樣',{sym:{'近期換或拔尿管':1,'血尿':1,'下腹脹痛':1,'發燒':-1},pe:{'腹部':['膀胱脹（恥骨上飽滿）'],'泌尿生殖/婦科':['導尿管阻塞或血塊']}}]],
+ '腹脹':[['便秘/脹氣樣',{loc:['全腹'],q:['脹氣'],sym:{'便秘':1,'打嗝或噯氣':1,'停止排氣排便':-1,'噁心嘔吐':-1,'發燒':-1,'黑便或血便':-1},pe:{'腹部':['腹脹','鼓音']}}],
+  ['腸阻塞樣',{q:['脹痛'],sym:{'停止排氣排便':1,'噁心嘔吐':1,'腹痛':1,'發燒':-1},pe:{'腹部':['腹脹','腸音亢進']}}],
+  ['腹水樣',{q:['腹圍增加'],sym:{'下肢水腫':1,'體重減輕':1,'黃疸':1,'發燒':-1,'腹痛':-1},pe:{'腹部':['腹水徵象（移動性濁音）','腹脹']}}]],
+ '水腫（下肢/全身）':[['心衰竭樣',{loc:['雙下肢'],q:['凹陷性'],sym:{'呼吸困難':1,'端坐呼吸':1,'體重增加':1,'發燒':-1,'局部紅熱痛':-1,'胸痛':-1},pe:{'四肢':['凹陷性水腫','雙側下肢水腫'],'胸/肺':['囉音 (rales)'],'心臟':'n'}}],
+  ['腎臟/低白蛋白樣',{loc:['雙下肢','臉部/眼周'],sym:{'泡沫尿':1,'尿量減少':1,'體重增加':1,'呼吸困難':-1,'胸痛':-1,'發燒':-1},pe:{'四肢':['凹陷性水腫'],'心臟':'n','胸/肺':'n'}}],
+  ['單側肢體（蜂窩/血栓）樣',{loc:['單側下肢'],sym:{'局部紅熱痛':1,'發燒':-1,'呼吸困難':-1,'胸痛':-1},pe:{'四肢':['單側肢體腫脹','肢體發紅發熱'],'心臟':'n'}}]],
+ '食慾不振':[['感染樣',{sym:{'發燒':1,'咳嗽':1,'全身無力':1,'噁心嘔吐':-1,'腹痛':-1,'腹瀉':-1},pe:{'胸/肺':'n','腹部':'n'}}],
+  ['腸胃樣',{sym:{'噁心嘔吐':1,'腹痛':1,'腹瀉':1,'發燒':-1,'黑便或血便':-1},pe:{'腹部':'n','一般外觀':'n'}}]],
+ '過度換氣':[['焦慮/恐慌發作樣',{sym:{'手腳麻木':1,'口周麻木':1,'焦慮或恐慌':1,'胸悶':1,'發燒':-1,'咳嗽':-1,'暈厥':-1},pe:{'胸/肺':'n','心臟':'n','神經':['手足痙攣 (carpopedal spasm)']}}]],
+ '轉診/入院評估':[['心肌梗塞轉診',{sym:{'胸痛':1,'呼吸困難':1,'發燒':-1},pe:{'心臟':'n','胸/肺':'n'}}]]});
+/* 英文病歷用詞（沒列在這裡的字會維持中文；已有的詞不覆蓋） */
+const E=o=>{for(const k in o)if(!(k in EN))EN[k]=o[k]};
+E({'尿滯留/解尿困難':'urinary retention','腹脹':'abdominal distension','水腫（下肢/全身）':'leg edema','食慾不振':'poor appetite','過度換氣':'hyperventilation','轉診/入院評估':'referral for admission evaluation',
+ '會陰':'perineum','腰側':'flank','雙下肢':'both lower limbs','單側下肢':'one lower limb','臉部/眼周':'face/periorbital area','手部':'hands','陰囊/會陰':'scrotum/perineum',
+ '脹痛':'distending pain','脹氣':'bloating','腹圍增加':'increased abdominal girth','凹陷性':'pitting','非凹陷性':'non-pitting',
+ '下腹脹痛':'lower abdominal distension and pain','尿流變細或解尿費力':'weak urinary stream or difficulty voiding','漏尿或溢尿':'urine leakage or overflow','近期換或拔尿管':'recent Foley change or removal','下肢無力或麻木':'lower limb weakness or numbness','新開藥物或調整劑量':'new medication or dose change',
+ '打嗝或噯氣':'belching or hiccups','停止排氣排便':'no passage of flatus or stool','黑便或血便':'melena or hematochezia','端坐呼吸':'orthopnea','夜間陣發性呼吸困難':'paroxysmal nocturnal dyspnea','體重增加':'weight gain','體重減輕':'weight loss','泡沫尿':'foamy urine','局部紅熱痛':'local redness, warmth and pain',
+ '近期長途旅行或臥床':'recent long travel or bed rest','新藥物（鈣離子阻斷劑/NSAID/類固醇）':'new medication (CCB/NSAID/steroid)','高鹽飲食或漏服藥':'high-salt diet or missed medication',
+ '吞嚥困難或疼痛':'dysphagia or odynophagia','口腔潰瘍或牙痛':'oral ulcer or toothache','全身無力':'generalized weakness','情緒低落或失眠':'low mood or insomnia',
+ '手腳麻木':'numbness of the hands and feet','口周麻木':'perioral numbness','手腳痙攣（手足搐搦）':'carpopedal spasm','胸悶':'chest tightness','焦慮或恐慌':'anxiety or panic','近期壓力事件':'recent stressful event','酒精或藥物使用':'alcohol or drug use',
+ '出血':'bleeding','疼痛控制':'pain control','症狀惡化':'symptom worsening','家屬或病人要求住院':'patient or family requested admission','活動受限':'limited range of motion','夜間痛':'night pain','皮膚破損或傷口':'skin break or wound',
+ '最後一次解尿時間':'last voiding time','導尿量（mL）':'catheterized volume (mL)','導尿管':'urinary catheter','長期留置':'long-term indwelling','近期更換':'recently changed','近期拔除':'recently removed',
+ '腹脹天數':'days of distension','最後排便時間':'last bowel movement','最後排氣時間':'last passage of flatus','水腫天數':'days of edema','體重增加（kg）':'weight gain (kg)','尿量變化':'urine output change','減少':'decreased','明顯減少':'markedly decreased',
+ '持續天數':'duration (days)','體重變化':'weight change','發作持續時間':'episode duration','過去類似發作':'similar past episodes',
+ '轉診原因':'reason for referral','進一步檢查或處置':'further evaluation or management','需加護病房':'needs ICU care','手術或介入評估':'surgical or interventional evaluation','專科會診':'specialty consultation','病況惡化':'clinical deterioration','家屬要求':'family request',
+ '轉出院所':'referring facility','轉診診斷':'referral diagnosis','外院檢查結果':'outside test results','外院已給予處置':'treatment given at outside facility','到院方式':'mode of arrival','救護車':'ambulance','自行就醫':'self-presented','家屬送':'brought by family','其他':'other',
+ '尿滯留':'urinary retention','攝護腺肥大':'benign prostatic hyperplasia','導尿管阻塞或功能異常':'Foley catheter obstruction or malfunction','肉眼血尿':'gross hematuria','神經性膀胱':'neurogenic bladder',
+ '腹水':'ascites','腸脹氣':'intestinal gas distension','消化不良':'dyspepsia','腹膜炎':'peritonitis','慢性腎臟病':'chronic kidney disease','腎病症候群':'nephrotic syndrome','靜脈功能不全':'venous insufficiency','低白蛋白血症':'hypoalbuminemia','水腫 原因未明':'edema of unknown cause',
+ '憂鬱':'depression','恐慌發作':'panic attack','急性焦慮':'acute anxiety','呼吸性鹼中毒':'respiratory alkalosis','非ST上升心肌梗塞 (NSTEMI)':'non-ST-elevation myocardial infarction (NSTEMI)','ST上升心肌梗塞 (STEMI)':'ST-elevation myocardial infarction (STEMI)','轉診評估':'referral evaluation',
+ '腹水徵象（移動性濁音）':'shifting dullness','鼓音':'tympanic percussion note','膀胱脹（恥骨上飽滿）':'distended bladder with suprapubic fullness','腸音亢進':'hyperactive bowel sounds','凹陷性水腫':'pitting edema','雙側下肢水腫':'bilateral lower limb edema','單側肢體腫脹':'unilateral limb swelling','肢體發紅發熱':'limb redness and warmth',
+ '攝護腺腫大':'enlarged prostate','導尿管阻塞或血塊':'catheter obstruction or blood clots','手足痙攣 (carpopedal spasm)':'carpopedal spasm','呼吸急促':'tachypnea','焦慮貌':'anxious appearance','消瘦':'cachexia',
+ '攝護腺肥大/尿滯留樣':'BPH/urinary retention-like','導尿管阻塞樣':'catheter obstruction-like','便秘/脹氣樣':'constipation/gas-like','腸阻塞樣':'bowel obstruction-like','腹水樣':'ascites-like','心衰竭樣':'heart failure-like','腎臟/低白蛋白樣':'renal/hypoalbuminemia-like','單側肢體（蜂窩/血栓）樣':'unilateral limb (cellulitis/DVT)-like','感染樣':'infection-like','腸胃樣':'gastrointestinal-like','焦慮/恐慌發作樣':'anxiety/panic attack-like','心肌梗塞轉診':'MI referral'});
+})();
+
 const NORMAL_RE='(?:正常|無異常|清晰|清澈|規律|未見異常|無壓痛|柔軟)';
 const DXLAB=/(?:診斷|Dx|DX|Impression|impression|考慮|懷疑|疑似|R\/O|\bdiagnos[ie]s\b|\bsuspect(?:ed)?\b|\bconsider(?:ing)?\b|\brule out\b|\bassessment\b|\bimpression\b)/i;
 const bodyOf=t=>{const i=t.search(DXLAB);return i>=0?t.slice(0,i):t};
@@ -973,15 +1135,16 @@ const emptyTr=()=>({chart:'tr',pd:null,hs:{},cc:[],time:'',when:'',moi:[],det:{}
 const stripFront=t=>t
  .replace(/\b(?:underlying|PHx?|Px|PMH|Hx|allergy|TOCC)\s*[:：]?\s*(?:nil|none|negative)\b/gi,' ')
  .replace(/\b(?:den(?:y|ied|ies)|no|without)(?:\s+of)?\s+(?:any\s+)?(?:known\s+)?(?:systemic|underlying|chronic|medical|past)\s+(?:diseases?|dx|illness(?:es)?|hx|PHx|PMH|history)\b/gi,' ')
+ .replace(/\b(?:denied|denies|deny|deneid|denid)\s+(?:of\s+)?(?:any\s*)?s?\s?y?stemic\s+(?:dx|disease|diseae|diseases|illness)\b/gi,' ')
  .replace(/\bNKD?A\b/gi,' ')
  .replace(/\b(?:den(?:y|ied|ies)|no)\s+(?:pregnan\w+|abd(?:ominal)?\s+op\w*|alcohol)\b/gi,' ')
  .replace(/(?:否認|無|沒有)\s*(?:可能)?懷孕[，,、\s]*/g,' ');
 const BPW='neck|chest|abdomen|abdominal|abd|back|head|pelvis|pelvic|limbs?|extremit(?:y|ies)|arms?|legs?|spine|flank|shoulders?|hips?|knees?|ankles?|wrists?|elbows?|thoracic|lumbar|cervical|c-spine|face|facial|eyes?|ears?|nose|throat|jaw',
  NEGLIST=new RegExp('\\b(no|denied|denies|without|negative for)\\s+((?:'+BPW+')(?:\\s*(?:,|\\/|\\band\\b|\\bor\\b)\\s*(?:'+BPW+'))+)\\s+(pain|tenderness|injury|trauma|swelling|numbness|deformity)\\b','gi');
-const TYPOS=[[/\bden(?:eid|yed|id|ide)\b/gi,'denied'],[/\bhea+dache?\b|\bhedache\b/gi,'headache'],[/\bcont[ua]ss?i?on?\b|\bcontusin\b|\bcontution\b/gi,'contusion'],[/\bec+h?[yi]mos[ie]s\b/gi,'ecchymosis'],[/\bfinver\b|\bfingre\b|\bfnger\b/gi,'finger'],[/\b(systemic|chronic|underlying|past)\s+dx\b/gi,'$1 disease'],[/\bA\/W\b/g,'abrasion'],[/\bL\/W\b/g,'laceration']];
+const TYPOS=[[/(\d)\s*-?\s*(?:yer|yers|yeas|yar|yrs?|y\.?r\.?s?)\s*-?\s*old\b/gi,'$1 year old'],[/(\d)\s?u\/o\b/gi,'$1 y/o'],[/\b(epigastr\w*|epigatric|epigastic|abd\w*|abodminal|periumbilical|lower abdomen|belly)\s+(?:(?:dull|cramping|colicky|sharp|severe|mild|intermittent|stabbing|burning|diffuse|bloating)(?:\/\w+)?\s+)+(?=pain)/gi,'$1 '],[/\b(feamel|femal|femael|famale)\b/gi,'female'],[/\b(mael|mle)\b/gi,'male'],[/\bden(?:eid|yed|id|ide)\b/gi,'denied'],[/\bhea+dache?\b|\bhedache\b/gi,'headache'],[/\bcont[ua]ss?i?on?\b|\bcontusin\b|\bcontution\b/gi,'contusion'],[/\bec+h?[yi]mos[ie]s\b/gi,'ecchymosis'],[/\bfinver\b|\bfingre\b|\bfnger\b/gi,'finger'],[/\b(systemic|chronic|underlying|past)\s+dx\b/gi,'$1 disease'],[/\btend(?:enress|eness|ernes|eress|reness|erenss)\b/gi,'tenderness'],[/\bsorn?ess\b/gi,'soreness'],[/\bA\/W\b/g,'abrasion'],[/\bL\/W\b/gi,'laceration']];
 const fixTypos=t=>TYPOS.reduce((s,[re,r])=>s.replace(re,r),t.replace(/\babd\.(?=\s|\/|,|$)/gi,'abdomen')).replace(NEGLIST,(m,n,list,noun)=>list.split(/\s*(?:,|\/|\band\b|\bor\b)\s*/).filter(Boolean).map(i=>n+' '+i+' '+noun).join(', '));
 const normPM=t=>fixTypos(t).replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*-\s*\)/g,'no $1').replace(/\b([A-Za-z][A-Za-z\/\-]{2,})\s*\(\s*\+\s*\)/g,'$1 present');
-const AGESEX=/\b\d{1,3}\s?(?:[MF](?!\s*height)\b|\/\s?[MFmf]\b)/g;const dropAgeSex=t=>t.replace(AGESEX,' ');
+const AGESEX=/\b\d{1,3}\s?(?:(?:[Yy](?:\/?[Oo])?\s?)?(?:[MF](?!\s*height)\b|\/\s?[MFmf]\b)|[Yy]\s?[mfMF]\b)/g;const dropAgeSex=t=>t.replace(AGESEX,' ');
 const prep=t=>normPM(stripFront(t));
 const CCMARK=/(?:due to|because of|came (?:to (?:the )?(?:ED|emergency department) )?(?:for|with|because(?: of)?)|present(?:ed|ing) with|chief complaint|\bCC\s*[:：]|主訴|因為|因)\s*[:：]?\s*/i;
 const HXRE=/\b(?:Hx of|history of|PMH|PHx|Px|underlying)\b\s*[:：]?[^.;\n]*?(?=\b(?:since|presented|came|complain\w*|c\/o|suffer\w*|having|noted|with|due|because)\b|[.;\n]|$)/gi;
@@ -1025,12 +1188,15 @@ function ruleAnticoag(t,r){const AC=/anticoagul\w*|warfarin|coumadin|\b(?:DOAC|N
 function parseTeta(t,r){
  const TT='(?:tetanus|\\bTd\\b|Tdap|\\bTT\\b|破傷風)';
  if(new RegExp(TT+'[^.;\\n]{0,25}\\b(?:given|administered|injected|today|in (?:the )?ED|here)\\b|\\b(?:given|administered|gave|received|got)\\b[^.;\\n]{0,15}'+TT+'[^.;\\n]{0,20}\\b(?:today|in (?:the )?ED|here|this visit)\\b|本次[^，。]{0,4}破傷風|給予破傷風|已打破傷風','i').test(t))return '本次已給予';
- const m=new RegExp(TT,'i').exec(t);if(!m)return '';
- const pre=t.slice(Math.max(0,m.index-30),m.index),post=t.slice(m.index,m.index+45).split(/[.;\n]/)[0],yr=(post.match(/(\d+)\s*(?:years?|yrs?|y\b|年)/i)||[])[1];
- const nm=/\b(?:no|not|never|without|denied?|missed)\b((?:\s+\w+){0,3})\s*$/i.exec(pre),neg=(!!nm&&/^(?:\s+(?:receive|received|receiving|have|had|get|got|take|taken|any|the|a|prior|previous))*$/i.test(nm[1]))||/^[^,;，]{0,22}(?:\(-\)|:\s*no\b|\bunknown\b|\bunclear\b|\bnone\b|未|沒|不詳)/i.test(post);
- const yt=yr?(' within '+yr+' year'+(+yr>1?'s':'')):'';
- if(neg){if(r)r.note=(r.note?r.note+'；':'')+'No tetanus vaccine'+(yr?' in recent '+yr+' year'+(+yr>1?'s':''):'')+'.';return yr&&+yr<=5?'需追加（髒傷口 >5 年）':'超過 10 年或不詳'}
- if(/\b(?:have|has|had|received|completed|done|up[- ]to[- ]date|present|within|given|vaccinated)\b|\(\+\)|有打|已打|接種過|年內|\bvaccine\b/i.test(pre+post)){if(r)r.note=(r.note?r.note+'；':'')+'Tetanus vaccine'+(yr?' received in recent '+yr+' year'+(+yr>1?'s':''):' received')+'.';return yr&&+yr>10?'超過 10 年或不詳':'10 年內曾接種'}
+ const ms=[...t.matchAll(new RegExp(TT,'ig'))];if(!ms.length)return '';
+ const info=ms.map(m=>{const pre=t.slice(Math.max(0,m.index-30),m.index),post=t.slice(m.index,m.index+45).split(/[.;\n]/)[0],yr=(post.match(/(\d+)\s*(?:years?|yrs?|y\b|年)/i)||[])[1];
+  const nm=/(?:\b(?:no|not|never|without|denied?|missed|haven't|hasn't|hadn't)\b|\b\w+n't\b)((?:\s+\w+){0,3})\s*$/i.exec(pre),
+  neg=(!!nm&&/^(?:\s+(?:receive|received|receiving|have|had|get|got|take|taken|any|the|a|prior|previous|history|of))*$/i.test(nm[1]))||/^[^,;，]{0,22}(?:\(-\)|:\s*no\b|\bunknown\b|\bunclear\b|\bnone\b|未|沒|不詳)/i.test(post);
+  return {pre,post,yr,neg}});
+ const n=info.find(i=>i.neg),yrs=s=>s.yr?(' in recent '+s.yr+' year'+(+s.yr>1?'s':'')):'';
+ if(n){if(r)r.note=(r.note?r.note+'；':'')+'No tetanus vaccine'+yrs(n)+'.';return n.yr&&+n.yr<=5?'需追加（髒傷口 >5 年）':'超過 10 年或不詳'}
+ const p=info.find(i=>/\b(?:have|has|had|received|completed|done|up[- ]to[- ]date|present|within|given|vaccinated)\b|\(\+\)|有打|已打|接種過|年內|\bvaccine\b/i.test(i.pre+i.post));
+ if(p){if(r)r.note=(r.note?r.note+'；':'')+'Tetanus vaccine received'+yrs(p)+'.';return p.yr&&+p.yr>10?'超過 10 年或不詳':'10 年內曾接種'}
  return ''}
 function ruleBg(t,r,pmhList,algList){
  Object.entries(PMHAL).forEach(([k,al])=>{const h=hit(t,al);if(h===1&&pmhList.includes(k))r.pmh.push(k)});
@@ -1048,13 +1214,18 @@ function ruleDx(t,r,dxMap){pickDx(t,Object.keys(dxMap)).forEach(n=>r.dx.push([n,
 
 function stripPd(p){if(!p)return null;if(!isPd())['ga','vax','dev','feed','care'].forEach(k=>delete p[k]);return Object.keys(p).length?p:null}
 const ABBR_U=/(?<![\w.\/-])(\d{1,3})\s?\/?\s?([MF])(?![A-Za-z])(?!\s*(?:height|high|tall))/,ABBR_L=/(?<![\w.\/-])(\d{1,3})\s?\/\s?([mf])(?![A-Za-z])/;
-const abbrAS=t=>{const m=ABBR_U.exec(t)||ABBR_L.exec(t);return m&&+m[1]<=120?{age:+m[1],sex:/m/i.test(m[2])?'男':'女'}:null};
-function parsePd(t){const p={};let m;
- if(m=t.match(/(\d+(?:\.\d+)?)\s*(?:個月|月大|months?|mos?\b|-month)/i))p.age={value:+m[1],unit:'月'};
+const ABBR_Y=/(?<![\w.\/-])(\d{1,3})\s?(?:y\/?o?|yrs?|y\.o\.?)\s?\/?\s?([MFmf])(?![A-Za-z])/i;
+const abbrAS=t=>{const m=ABBR_Y.exec(t)||ABBR_U.exec(t)||ABBR_L.exec(t);return m&&+m[1]<=120?{age:+m[1],sex:/m/i.test(m[2])?'男':'女'}:null};
+function parsePd(t0){const t=t0.replace(/\b(?:in|within|for|over|past|last|recent)\s+(?:the\s+)?(?:recent\s+|past\s+|last\s+)?\d+\s*(?:years?|yrs?)\b/gi,' ');const p={};let m;
+ if(m=t.match(/(\d+)\s*Y\s*(\d+)\s*M\b/i)){const mo=12*(+m[1])+(+m[2]);p.age=+m[1]>=2?{value:+m[1],unit:'歲'}:{value:mo,unit:'月'}}
+ else if(m=t.match(/(\d+)\s*-?\s*m\/o\b/i))p.age={value:+m[1],unit:'月'};
+ else if(m=t.match(/(\d+(?:\.\d+)?)\s*(?:個月|月大|months?|mos?\b|-month)/i))p.age={value:+m[1],unit:'月'};
  else if(m=t.match(/(\d+)\s*(?:週大|weeks?[- ]old)/i))p.age={value:+m[1]*7,unit:'天'};
  else if(m=t.match(/(\d+)\s*(?:天大|days?[- ]old)/i))p.age={value:+m[1],unit:'天'};
  else if(m=t.match(/(\d+)\s*(?:歲|years?|yrs?|y\/?o\b|-year)/i))p.age={value:+m[1],unit:'歲'};
  else if(m=abbrAS(t))p.age={value:m.age,unit:'歲'};
+ else if(m=t.match(/\b(\d{1,3})\s?Y\b(?=[\s,-]*(?:boy|girl|male|female|man|woman|baby|child|infant|M\b|F\b))/i))p.age={value:+m[1],unit:'歲'};
+ else if(m=t.match(/(?<![\d.\/:-])(\d{1,3})\s+(?:female|male|man|woman|lady|gentleman|boy|girl|patient|pt)\b/i)){if(+m[1]<=120)p.age={value:+m[1],unit:'歲'}}
  if(/男童|男孩|男嬰|男性|先生|\b(?:boy|male|man|gentleman|guy|son)\b/i.test(t))p.sex='男';else if(/女童|女孩|女嬰|女性|女士|小姐|\b(?:girl|female|woman|lady|daughter)\b/i.test(t))p.sex='女';
  else if(m=abbrAS(t))p.sex=m.sex;
  if(m=t.match(/(\d+(?:\.\d+)?)\s*(?:kg|公斤)/i))p.wt=m[1];
@@ -1118,11 +1289,12 @@ function ruleNt(t0){
   else{const ea=[...(PEEN[s]||[]),...(enOf(s)?[enOf(s)]:[])];if(ea.some(a=>new RegExp('\\b'+a.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')+'\\b[^,.;]{0,24}\\b(?:normal|unremarkable|clear|regular|soft|non-?tender|benign)\\b','i').test(body)))r.pe[s]={...(r.pe[s]||{n:[]}),st:'n',f:[]}}});
  ruleDx(t0,r,DXM());return r}
 
-const MOIAL={'機車/自行車事故':['機車','摩托車','腳踏車','自行車','單車','騎車'],'汽車事故':['汽車','開車','轎車','貨車'],'行人被撞':['行人','被車撞'],'墜落':['墜落','摔下','跌落','高處'],'跌倒（平地）':['跌倒','滑倒','絆倒','摔倒','自摔'],'重物壓砸/夾傷':['壓傷','砸','夾傷','壓住','掉落物'],
+const MOIAL={'機車/自行車事故':['機車','摩托車','腳踏車','自行車','單車','騎車'],'汽車事故':['汽車','開車','轎車','貨車'],'行人被撞':['行人','被車撞'],'墜落':['墜落','摔下','跌落','高處','樓梯'],'跌倒（平地）':['跌倒','滑倒','絆倒','摔倒','自摔'],'重物壓砸/夾傷':['壓傷','砸','夾傷','壓住','掉落物'],
  '銳器傷':['割傷','刺傷','刀傷','刀割','菜刀','水果刀','切傷','被砍'],'鈍器/毆打':['毆打','打傷','被打','鈍器','被毆','被揍','家暴','拳頭','被踢'],'槍傷/爆炸':['槍','爆炸'],'燒燙傷':['燒傷','燙傷','燒燙'],'異物/化學物濺入':['異物','濺入','誤吞','吞入'],'動物咬傷':['咬傷','被狗咬','被貓咬'],'運動傷害':['打球','跑步','運動傷害']};
 const REGKW={'頭部/頭皮':['頭皮','頭部'],'臉部':['臉','顏面','面部','下巴','額頭','額'],'眼':['眼'],'耳':['耳'],'鼻':['鼻'],'口腔/牙齒':['牙','口腔','嘴','下顎','唇','舌'],'咽喉':['咽','喉'],'頸部':['頸'],'胸部':['胸','肋'],'腹部':['腹'],'骨盆/會陰':['骨盆','會陰'],'背部/脊椎':['背','脊椎','腰'],
  '上肢':['上肢','手','臂','肘','肩','腕','橈','尺骨','肱','鎖骨'],'下肢':['下肢','腿','膝','踝','足','腳','髖','脛','腓','跟','蹠'],'全身皮膚':['全身皮膚','多處擦傷']};
-const LIMBAL={'疑似骨折':['骨折'],'疑似脫位':['脫臼','脫位'],'腫脹':['腫'],'變形':['變形'],'撕裂傷':['撕裂傷','割傷'],'擦傷':['擦傷'],'挫傷':['挫傷','瘀青','瘀傷','瘀血','烏青'],'活動受限':['活動受限','無法活動','無法負重','不能走','無法行走'],'壓痛':['壓痛'],'疼痛':['疼痛','疼'],'疑似扭傷':['扭傷','扭到','拉傷'],'感覺或運動異常':['麻木','發麻','感覺異常','無力']};
+const _ra=1;
+const LIMBAL={'疑似骨折':['骨折'],'疑似脫位':['脫臼','脫位'],'腫脹':['腫'],'變形':['變形'],'撕裂傷':['撕裂傷','割傷'],'擦傷':['擦傷'],'挫傷':['挫傷','瘀青','瘀傷','瘀血','烏青'],'活動受限':['活動受限','無法活動','無法負重','不能走','無法行走'],'壓痛':['壓痛'],'疼痛':['疼痛','疼','痠痛','酸痛'],'疑似扭傷':['扭傷','扭到','拉傷'],'感覺或運動異常':['麻木','發麻','感覺異常','無力']};
 const ABCRX={'呼吸道':[['通暢可說話',/呼吸道通暢|可說話|言語清楚/],['部分阻塞',/呼吸道[^，。]{0,4}部分阻塞/],['完全阻塞',/呼吸道[^，。]{0,4}完全阻塞/]],
  '頸椎':[['已固定',/頸圈/]],'頸椎壓痛':[['無',/(?:無|沒有)頸椎壓痛/],['有',/(?<!無)(?<!沒有)頸椎壓痛/]],
  '呼吸音':[['雙側正常',/(?:雙側)?呼吸音(?:雙側)?正常|雙側呼吸音清/],['左側減弱',/左側?呼吸音減/],['右側減弱',/右側?呼吸音減/],['雙側減弱',/雙側呼吸音減/]],
@@ -1133,7 +1305,7 @@ const ABCRX={'呼吸道':[['通暢可說話',/呼吸道通暢|可說話|言語�
 const SPEEDB=v=>v<30?'<30 km/h':v<=60?'30-60 km/h':'>60 km/h';
 const HEIGHTB=v=>v<2?'<2 m':v<=5?'2-5 m':'>5 m';
 
-const MOIEN={'機車/自行車事故':['motorcycle','scooter','bicycle','bike crash','motorbike'],'汽車事故':['car crash','car accident','mvc','motor vehicle'],'行人被撞':['pedestrian'],'墜落':['fall from','fell from','fall from height','fell off a','fall from stairs','fall down stairs','fell down stairs'],'跌倒（平地）':['ground-level fall','slipped','tripped','fell down','fall down','falling down','slip down','slipped down','slipping','after falling','after a fall','falls down','fell over','fell on','fall on','falling onto','falling on','fall onto','fell onto','fell over'],'重物壓砸/夾傷':['crush','crushed','pinned','hit by a falling','struck by a falling','hit by falling','falling object','falling sign','caught in','caught between'],'銳器傷':['stab','stabbed','cut by','cut with','knife','blade','razor','sharp object'],'鈍器/毆打':['assault','assaulted','punched','struck with','hit by husband','hit by wife','hit by his','hit by her','hit by someone','hit by a person','hit by boyfriend','hit by girlfriend','hit by neighbor','beaten','beat up','kicked','domestic violence'],'槍傷/爆炸':['gunshot','blast','explosion'],'燒燙傷':['burn','scald'],'異物/化學物濺入':['foreign body','chemical splash','naoh','koh','alkali','bleach','acid splash','splash'],'動物咬傷':['bite','bitten'],'運動傷害':['sports','playing']};
+const MOIEN={'機車/自行車事故':['motorcycle','scooter','bicycle','bike crash','motorbike'],'汽車事故':['car crash','car accident','mvc','motor vehicle'],'行人被撞':['pedestrian'],'墜落':['fall from','fell from','fall from height','fell off a','fall from stairs','fall down stairs','fell down stairs','falling from','falling off','from the stairs','from stairs','down the stairs','down stairs','off the stairs','staircase'],'跌倒（平地）':['ground-level fall','slipped','tripped','fell down','fall down','falling down','slip down','slipped down','slipping','after falling','after a fall','falls down','fell over','fell on','fall on','falling onto','falling on','fall onto','fell onto','fell over'],'重物壓砸/夾傷':['crush','crushed','pinned','hit by a falling','struck by a falling','hit by falling','falling object','falling sign','caught in','caught between'],'銳器傷':['stab','stabbed','cut by','cut with','knife','blade','razor','sharp object'],'鈍器/毆打':['assault','assaulted','punched','struck with','hit by husband','hit by wife','hit by his','hit by her','hit by someone','hit by a person','hit by boyfriend','hit by girlfriend','hit by neighbor','beaten','beat up','kicked','domestic violence'],'槍傷/爆炸':['gunshot','blast','explosion'],'燒燙傷':['burn','scald'],'異物/化學物濺入':['foreign body','chemical splash','naoh','koh','alkali','bleach','acid splash','splash'],'動物咬傷':['bite','bitten'],'運動傷害':['sports','playing']};
 Object.assign(MOIAL,{'電焊/紫外線暴露':['電焊','焊接','雪盲','紫外線','電弧']});
 MOIAL['異物/化學物濺入']=[...MOIAL['異物/化學物濺入'],'魚刺','魚骨','魚鯁','鐵屑','沙子','卡在','卡到','濺到','噴濺','噴到','潑到'];
 Object.assign(MOIEN,{'電焊/紫外線暴露':['welding','welder','arc eye','flash burn','uv exposure','snow blindness']});
@@ -1143,15 +1315,15 @@ const FBO_RG={ear:'耳',耳:'耳',nose:'鼻',nostril:'鼻',鼻:'鼻',eye:'眼',�
 const FIND_AL={'耳痛':['耳痛','耳朵痛','ear pain','earache'],'畏光':['怕光','畏光','photophobia','sensitive to light'],'流淚':['流淚','一直流眼淚','tearing','watering'],'眼睛疼痛':['眼痛','眼睛痛','眼睛劇痛','兩眼劇痛','eye pain','painful eyes'],'視力下降':['視力模糊','看不清','blurred vision','vision loss'],
  '異物感':['異物感','卡卡的','像有東西','feels stuck','foreign body sensation','something stuck'],'吞嚥疼痛':['吞嚥痛','吞嚥疼痛','吞東西會痛','吞口水會痛','painful swallowing','odynophagia'],'流口水':['流口水','drooling'],'聲音沙啞':['聲音沙啞','hoarse'],
  '呼吸喘鳴':['stridor'],'角膜擦傷（螢光染色陽性）':['螢光染色陽性','fluorescein','corneal abrasion'],'鼻出血':['流鼻血','鼻血','nosebleed','epistaxis'],'耳漏':['耳漏','ear discharge'],'聽力下降':['聽不清','hearing loss'],'張口困難':['trismus']};
-const REGEN={'頭部/頭皮':['scalp','head','temple','occiput'],'臉部':['face','facial','chin','cheek','eyebrow','brow','forehead'],'眼':['eye'],'耳':['ear'],'鼻':['nose','nasal'],'口腔/牙齒':['tooth','teeth','mouth','jaw','lip','lips','tongue','gum','gums'],'咽喉':['throat'],'頸部':['neck'],'胸部':['chest','rib','ribs'],'腹部':['abdomen','abdominal'],'骨盆/會陰':['pelvis','perineum'],'背部/脊椎':['back','spine','lumbar','lower back','low back'],'上肢':['arm','forearm','elbow','shoulder','wrist','hand','finger','fingers','thumb','palm','upper limb','radi(?:us|al)','uln\\w+','humer\\w+','clavic\\w+','scaphoid','snuffbox','anatomical snuffbox','carpal\\w*'],'下肢':['leg','thigh','knee','ankle','foot','hip','heel','calf','shin','lower limb','malleol\\w*','calcane\\w+','tibi\\w+','fibul\\w+','metatars\\w+','toes?']};
+const REGEN={'頭部/頭皮':['scalp','head','temple','occiput'],'臉部':['face','facial','chin','cheek','eyebrow','brow','forehead'],'眼':['eye'],'耳':['ear'],'鼻':['nose','nasal'],'口腔/牙齒':['tooth','teeth','mouth','jaw','lip','lips','tongue','gum','gums'],'咽喉':['throat'],'頸部':['neck'],'胸部':['chest','rib','ribs'],'腹部':['abdomen','abdominal'],'骨盆/會陰':['pelvis','perineum'],'背部/脊椎':['back','spine','lumbar','lower back','low back'],'上肢':['arm','forearm','elbow','shoulder','wrist','hand','finger','fingers','thumb','palm','upper limb','radi(?:us|al)','uln\\w+','humer\\w+','clavic\\w+','scaphoid','snuffbox','anatomical snuffbox','carpal\\w*'],'全身皮膚':['multiple abrasions?','multiple contusions?','multiple bruises'],'下肢':['leg','thigh','knee','ankle','foot','hip','heel','calf','shin','lower limb','malleol\\w*','calcane\\w+','tibi\\w+','fibul\\w+','metatars\\w+','toes?']};
 const SITEEN={'肩':['shoulder'],'上臂':['upper arm'],'肘':['elbow'],'前臂':['forearm'],'腕':['wrist','snuffbox','carpal','scaphoid'],'手':['hand','finger','fingers','thumb','palm'],'髖':['hip'],'大腿':['thigh'],'膝':['knee'],'小腿':['lower leg','calf','shin'],'踝':['ankle','malleol'],'足':['foot','toe']};
-const LIMBEN={'疑似骨折':['fracture'],'疑似脫位':['dislocation'],'腫脹':['swelling','swollen'],'變形':['deformity','deformed'],'撕裂傷':['laceration'],'擦傷':['abrasion'],'挫傷':['contusion','bruise','bruising','bruised','ecchymosis','ecchymoses','ecchymotic','hematoma','haematoma'],'活動受限':['limited range','restricted movement','unable to bear weight','cannot bear weight','unable to walk','limping'],'壓痛':['tenderness','tender to palpation'],'疼痛':['pain','painful'],'疑似扭傷':['sprain','sprained','twisted','rolled']};LIMBEN['撕裂傷']=['laceration','lacerated','cut','cuts'];LIMBEN['感覺或運動異常']=['weak','numbness','numb','paresthesia','tingling','weakness'];
+const LIMBEN={'疑似骨折':['fracture'],'疑似脫位':['dislocation'],'腫脹':['swelling','swollen'],'變形':['deformity','deformed'],'撕裂傷':['laceration'],'擦傷':['abrasion'],'挫傷':['contusion','bruise','bruising','bruised','ecchymosis','ecchymoses','ecchymotic','hematoma','haematoma'],'活動受限':['limited range','restricted movement','unable to bear weight','cannot bear weight','unable to walk','limping'],'壓痛':['tenderness','tender to palpation'],'疼痛':['pain','painful','soreness','sore'],'疑似扭傷':['sprain','sprained','twisted','rolled']};LIMBEN['撕裂傷']=['laceration','lacerated','cut','cuts'];LIMBEN['感覺或運動異常']=['weak','numbness','numb','paresthesia','tingling','weakness'];
 const ABCEN={'呼吸道':[['通暢可說話',/airway (?:is )?patent|patent airway|speaking in full/i]],'頸椎':[['已固定',/c-?collar|cervical collar|\bcollar\b/i]],'頸椎壓痛':[['無',/(?:no|without) (?:c-?spine|cervical|neck) tenderness/i],['有',/(?:c-?spine|cervical|neck) tenderness/i]],
  '呼吸音':[['雙側正常',/bilateral breath sounds (?:clear|equal|normal)|clear bilaterally|equal breath sounds/i],['左側減弱',/(?:decreased|diminished|reduced) breath sounds (?:on the |in the |at the )?left|left(?:-sided)? (?:decreased|diminished|reduced) breath sounds/i],['右側減弱',/(?:decreased|diminished|reduced) breath sounds (?:on the |in the |at the )?right|right(?:-sided)? (?:decreased|diminished|reduced) breath sounds/i],['雙側減弱',/(?:decreased|diminished|reduced) breath sounds bilaterally|bilateral(?:ly)? (?:decreased|diminished|reduced) breath sounds/i]],
  '外出血':[['無',/\b(?:no|without|denies?)\s+(?:(?:active|ongoing|external|obvious|gross|further|significant|massive|persistent)\s+)*(?:bleeding|hemorrhage)/i],['可控制',/bleeding (?:is )?controlled/i],['持續出血',/(?<!\bno )(?<!\bwithout )(?:ongoing|active|uncontrolled) bleeding/i]],'脈搏':[['橈動脈可觸及',/radial pulses? (?:palpable|present)|palpable radial/i],['無脈搏',/pulseless|no pulse/i]],'骨盆':[['不穩定',/pelvis (?:is )?unstable|unstable pelvis|pelvic instability/i],['穩定',/pelvis (?:is )?stable|(?<!un)stable pelvis|pelvis stable|pelvic ring stable/i]],
  'eFAST':[['陰性',/\bno e?FAST\b|e?FAST\s*(?:negative|neg)\b|negative e?FAST|e?FAST\s*\(?\s*-\s*\)?(?![\w])/i],['陽性',/e?FAST\s*(?:positive|pos|present)\b|positive e?FAST|e?FAST\s*\(\s*\+\s*\)/i]],'瞳孔':[['雙側無對光反射',/\bno (?:pupillary )?(?:light )?reflex|non-?reactive|unreactive|fixed pupils?|absent (?:light )?reflex|無對光反射/i],['等大對光正常',/pupils? (?:are )?(?:equal|PERRL|reactive)|\bPERRL/i],['不等大',/unequal pupils|anisocoria/i]],'肢體活動':[['四肢可動',/moves? all (?:four )?extremities|all extremities (?:move|moving)/i]]};
 function ruleTr(t00){
- const t0=prep(t00);
+ const t0=prep(t00).replace(/\ba\/w\b/gi,'abrasion');
  const r=emptyTr(),t=bodyOf(t0).replace(/\b(?:an |his |her )?outstretched hand\b/gi,'FOOSH');
  if(/\bjust now\b|剛剛|剛才/i.test(t))r.when='just now';
  const rt=r.time?null:relTime(numNorm(t));if(rt&&rt.unit!=='天')r.time=hhmm(new Date(Date.now()-rt.mins*60000));
@@ -1197,14 +1369,14 @@ function ruleTr(t00){
  {const gi=t.search(/GCS|\bD\s*[:：]/i);if(gi>=0){const seg=t.slice(gi,gi+45),E=/(?<![A-Za-z])E\s*([1-4])(?!\d)/i.exec(seg),Vv=/(?<![A-Za-z])V\s*([1-5])(?!\d)/i.exec(seg),Mm=/(?<![A-Za-z])M\s*([1-6])(?!\d)/i.exec(seg);if(E&&Vv&&Mm)r.gcs={e:E[1],v:Vv[1],m:Mm[1]};else if(/GCS\s*[:：]?\s*15/i.test(seg))r.gcs={e:'4',v:'5',m:'6'}}
   if(!r.gcs){const gm=/GCS\s*[:：]?\s*(\d{1,2})(?![\d]|\s*[EVMevm]\s*\d)/i.exec(t);if(gm){const n=+gm[1];if(n===3)r.gcs={e:'1',v:'1',m:'1'};else if(n===15)r.gcs={e:'4',v:'5',m:'6'};else if(n>3&&n<15)r.note=(r.note?r.note+'；':'')+'GCS '+n}}}
  // 傷處
- const regIn=q=>/\blimbs\b|\bextremities\b|四肢/i.test(q)||Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
- const FINDW=/weakness|\bweak\b|numbness|numb\b|paresthesia|tingling|麻|ecchymos\w*|bruis\w*|contusion|laceration|abrasion|swelling|swollen|deformity|fracture|tenderness|pain|瘀青|挫傷|擦傷|撕裂傷|腫|痛/i;
+ const regIn=q=>/\bfour\s+limbs?\b|\blimbs\b|\bextremities\b|四肢/i.test(q)||Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
+ const FINDW=/soreness|weakness|\bweak\b|numbness|numb\b|paresthesia|tingling|麻|ecchymos\w*|bruis\w*|contusion|laceration|abrasion|swelling|swollen|deformity|fracture|tenderness|pain|瘀青|挫傷|擦傷|撕裂傷|腫|痛/i;
  let lastF='',pend=[];const parts=[];
- t.split(/[，,。；;\n]|\.(?=\s|$)|\s+(?=\b(?:no|denied|denies|without)\s)/i).forEach(p0=>{const pcs=p0.split(/\s+and\s+|及|和|、/);const segs=pcs.length>1&&pcs.filter(regIn).length>1?pcs:[p0];
+ t.split(/[，,。；;\n]|\.(?=\s|$)|\s+(?=\b(?:no|denied|denies|without)\s)|(?<=\b(?:no|denied|denies|without)\s+(?:\w+\s+){0,2}(?:injury|trauma|pain|tenderness|swelling|deformity))\s+(?!(?:and|or|over|at|in|on|of|to)\b)(?=\w)/i).forEach(p0=>{const pcs=p0.split(/\s+and\s+|及|和|、/);const segs=pcs.length>1&&pcs.filter(regIn).length>1?pcs:[p0];
   segs.forEach(p=>{const fm=FINDW.exec(p),hasNeg=/\b(?:no|not|denied|denies|without)\b|無|沒/i.test(p);
    if(fm){if(!isNeg(p,fm.index)){lastF=fm[0];if(pend.length){pend.forEach(i=>{parts[i]+=' '+fm[0]});pend=[]}}}
    else if(regIn(p)&&!hasNeg){if(lastF)p=p+' '+lastF;else pend.push(parts.length)}
-   const LMB=/\b(?:four\s+)?(?:limbs|extremities)\b|四肢/i;
+   const LMB=/\bfour\s+limbs?\b|\blimbs\b|\bextremities\b|四肢/i;
    if(LMB.test(p)&&!/upper|lower|\barms?\b|\blegs?\b|上肢|下肢/i.test(p)){parts.push(p.replace(LMB,'upper limb'),p.replace(LMB,'lower limb'))}else parts.push(p)})});
  const NEGREG=/(?:無|沒有)[^，。]{0,4}(?:壓痛|傷|異常)|正常|\b(?:non-?tender|no (?:tenderness|injury|deformity)|normal|unremarkable)\b/i;
  const ABNREG=/骨折|變形|腫|撕裂|擦傷|挫傷|血腫|\b(?:fracture|deform|swell|swollen|laceration|abrasion|contusion|bruis|hematoma|tender|pain|bleed)/i;
@@ -1228,7 +1400,9 @@ function ruleTr(t00){
    Object.entries(LIMBAL).forEach(([f,al])=>{if(al.some(a=>p.includes(a)&&!isNeg(p,p.indexOf(a)))||(LIMBEN[f]||[]).some(w=>pl.includes(w)&&!isNeg(p,pl.indexOf(w))))e.f.push(f)})}
   else{def.f.forEach(f=>{const w=strip(f),en2=enOf(f);if((p.includes(w)&&!isNeg(p,p.indexOf(w)))||(en2&&pl.includes(en2)&&!isNeg(p,pl.indexOf(en2))))e.f.push(f)});if(def.side&&sdv)e.side.push(sdv);
    const LACK={'口唇撕裂傷':/\blips?\b|唇/i,'牙齦撕裂傷':/\bgums?\b|gingiv|牙齦/i},lacs=def.f.filter(x=>/撕裂傷/.test(x)),lac=lacs.find(x=>LACK[x]&&LACK[x].test(p))||lacs.find(x=>!LACK[x])||lacs[0];if(lac&&/lacerat|\bcut\b|撕裂|裂傷|割傷|割到/i.test(p)&&!isNeg(p,Math.max(0,pl.search(/lacerat|\bcut\b/)))&&!e.f.includes(lac))e.f.push(lac);
-   ['挫傷','擦傷','疼痛'].forEach(x0=>{const x=def.f.includes(x0)?x0:(x0==='挫傷'&&def.f.includes('胸壁挫傷')?'胸壁挫傷':null);if(!x||e.f.includes(x))return;if((LIMBAL[x0]||[]).some(a=>p.includes(a)&&!isNeg(p,p.indexOf(a)))||(LIMBEN[x0]||[]).some(w=>pl.includes(w)&&!isNeg(p,pl.indexOf(w))))e.f.push(x)})}
+   if(rg==='全身皮膚'&&/multiple abrasions?|多處擦傷/i.test(p)&&!isNeg(p,0)&&!e.f.includes('多處擦傷'))e.f.push('多處擦傷');
+   if(rg==='全身皮膚'&&/multiple (?:contusions?|bruises)/i.test(p)&&!e.f.includes('瘀青'))e.f.push('瘀青');
+   ['挫傷','擦傷','疼痛','壓痛'].forEach(x0=>{const x=def.f.includes(x0)?x0:(x0==='挫傷'&&def.f.includes('胸壁挫傷')?'胸壁挫傷':null);if(!x||e.f.includes(x))return;if((LIMBAL[x0]||[]).some(a=>p.includes(a)&&!isNeg(p,p.indexOf(a)))||(LIMBEN[x0]||[]).some(w=>pl.includes(w)&&!isNeg(p,pl.indexOf(w))))e.f.push(x)})}
   if(!e.f.length&&!e.site.length){if(e.n.length)e.st='';else delete r.reg[rg]}});
  Object.entries(REG).forEach(([rg,def])=>{if(def.sites)return;def.f.forEach(f=>{const w=strip(f);if(w.length>=4&&t.includes(w)&&!isNeg(t,t.indexOf(w))){const e=r.reg[rg]=r.reg[rg]&&r.reg[rg].st==='a'?r.reg[rg]:{st:'a',f:[],side:[],site:[]};if(!e.f.includes(f))e.f.push(f)}})});
  expandNegSweep(t,r.reg);
@@ -1245,11 +1419,13 @@ function ruleTr(t00){
  if(fbo){const w=(fbo[1]||fbo[2]||fbo[3]||'').toLowerCase(),rg=FBO_RG[w];if(rg){const e=r.reg[rg]=r.reg[rg]&&r.reg[rg].st==='a'?r.reg[rg]:{st:'a',f:[],side:[],site:[]};if(!e.f.includes(FBO_F[rg]))e.f.push(FBO_F[rg])}}
  Object.values(r.reg).forEach(e=>{e.side=[...new Set(e.side||[])];e.site=[...new Set(e.site||[])];e.f=[...new Set(e.f||[])];e.n=[...new Set(e.n||[])].filter(x=>!e.f.includes(x))});
  if((r.det['異物/化學物濺入']||{})['部位']==='皮膚'){const e=r.reg['全身皮膚']=r.reg['全身皮膚']||{st:'a',f:[],n:[],side:[],site:[]};e.st='a';if(!e.f.includes('燒燙傷'))e.f.push('燒燙傷')}
+ [[/nasal (?:bone )?fracture|鼻骨骨折/i,'鼻','鼻骨骨折'],[/mandib\w* fracture|jaw fracture|下顎骨折/i,'口腔/牙齒','下顎骨折'],[/\brib fractures?|肋骨骨折/i,'胸部','肋骨骨折'],[/pelvi\w* fracture|骨盆骨折/i,'骨盆/會陰','骨盆骨折']].forEach(([re,rg,dx])=>{if(re.test(t)&&!(r.reg[rg]&&r.reg[rg].st==='a')){const e0=r.reg[rg]||{f:[],n:[],side:[],site:[]};r.reg[rg]=Object.assign(e0,{st:'a'});if(!r.dx.some(d=>d[0]===dx))r.dx.push([dx,DXTR[dx]||''])}});
+ if(/\b(?:burn(?:ed|s)?|scald(?:ed)?)\b|燙傷|燒傷|燒燙傷/i.test(t)&&!/\b(?:no|denied|without)\s+(?:\w+\s+){0,2}burn/i.test(t)){const e=r.reg['全身皮膚']=r.reg['全身皮膚']||{st:'a',f:[],n:[],side:[],site:[]};e.st='a';if(!e.f.includes('燒燙傷'))e.f.push('燒燙傷');if(!r.moi.includes('燒燙傷'))r.moi.push('燒燙傷')}
  const inv={};TRCC.forEach(g=>g[1].forEach(x=>inv[x[1]]=x[0]));
  r.cc=Object.keys(r.reg).filter(k=>r.reg[k].st==='a').map(k=>inv[k]).filter(Boolean);
  r.pd=stripPd(parsePd(t));
  {const DEMO=/allerg|\b(?:y\/?o|yo|years?[- ]old|year-old|months?[- ]old|girl|boy|male|female|man|woman|child|patient)\b|歲|男童|女童|男性|女性|systemic|\bNKD?A\b|no known allerg|chronic|medical history|病史|過敏|健康|healthy|慢性|疾病|無病|^\s*GCS/i;let ccp='';
-  const cand=[];for(const s of prep(t0).split(/\n+|[。.;；]+(?=\s|$)/))for(const p of s.split(/[,，]/)){const q=p.trim().replace(/^\d{1,3}\s?(?:[MF]\b|\/\s?[MFmf]\b)[\s,]*/,'').replace(/^(?:chief complaint|cc|主訴)\s*[:：]?\s*/i,'').replace(/^(?:went to|came to|presented to|visited|brought to)\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b\s*(?:due to|because of|for|with|after)?\s*/i,'').replace(/\s*(?:came|went|presented|visited)\s+to\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b.*$/i,'');if(q.length>=3&&!DEMO.test(q)&&!/^(?:no|nil|den(?:y|ied|ies)|without|negative)\b/i.test(q)&&!/^(?:Px|PHx|Hx|PMH|Underlying|TOCC)\b/i.test(q)&&!/^[A-E]\s*[:：]/.test(q)&&!/\b(?:GCS|EFAST|FAST|pupils?|airway|breath sounds|pelvis (?:is )?stable)\b/i.test(q))cand.push(q)}
+  const cand=[];for(const s of prep(t0).split(/\n+|[。.;；]+(?=\s|$)/))for(const p of s.split(/[,，]/)){const q=p.trim().replace(/^\d{1,3}\s?(?:[Yy]\/?[Oo]?\s?)?(?:[MF]\b|[mfMF]\b|\/\s?[MFmf]\b)[\s,]*/,'').replace(/^(?:chief complaint|cc|主訴)\s*[:：]?\s*/i,'').replace(/^(?:went to|came to|presented to|visited|brought to)\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b\s*(?:due to|because of|for|with|after)?\s*/i,'').replace(/\s*(?:came|went|presented|visited)\s+to\s+(?:our\s+|the\s+)?(?:ED|emergency department|ER)\b.*$/i,'');if(q.length>=3&&!DEMO.test(q)&&!/^(?:no|nil|den(?:y|ied|ies)|without|negative)\b/i.test(q)&&!/^(?:Px|PHx|Hx|PMH|Underlying|TOCC)\b/i.test(q)&&!/^[A-E]\s*[:：]/.test(q)&&!/\b(?:GCS|EFAST|FAST|pupils?|airway|breath sounds|pelvis (?:is )?stable)\b/i.test(q))cand.push(q)}
   const SYMW=/ecchym|bruis|contusion|pain|ache|swell|injur|deform|numb|tender|laceration|wound|bleed|burn|abrasion|contusion|sprain|fractur|痛|傷|腫|麻/i,MECHW=/\bTA\b|\bMVA\b|\bMVC\b|crash|accident|\bfall(?:ing)?\b|\bfell\b|slipped|tripped|struck|hit by|just now|scooter to|motor to/i,hasReg=q=>Object.values(REGKW).some(a=>a.some(k=>q.includes(k)))||Object.values(REGEN).some(a=>a.some(k=>new RegExp('\\b'+k+'\\b','i').test(q)));
   const TIMEW=/^(?:tonight|today|just now|this (?:morning|afternoon|evening)|yesterday|last night)$/i;
   const NEGQ=/\b(?:no|denied|denies|without|nil|negative)\b/i;
@@ -1402,15 +1578,19 @@ function runRule(){const t=S.nl.trim();if(!t){NL.msg=Z('請先輸入文字。','
  autoMode(t);
  nlDone(isTr()?ruleTr(t):ruleNt(t),Z('快速解析','Quick parse'))}
 const PEDS_RE=/小兒|嬰兒|幼兒|小孩|新生兒|寶寶|男童|女童|(\d+(?:\.\d+)?)\s*(?:個月|月大|週大|天大)|\b(?:pediatric|paediatric|infant|toddler|newborn|neonate|baby|\d+\s*(?:-|\s)?(?:month|mo|week|wk|day)s?[- ]old|\d+\s*(?:months?|mos)\b)/i;
-const ageYears=t=>{const m=t.match(/(\d+)\s*(?:歲|[- ]?years?[- ]?old|\s?y\/?o\b|\s?yrs?\b)/i)||t.match(/\b(\d{1,3})\s?(?:[MF](?!\s*height)\b|\/\s?[MFmf]\b)/);return m?+m[1]:null};
-const PEDS_WEAK=/\bTOCC\b|\bactivity\b|\bappetite\b|\bNSD\b|\bBW\s*\d/i;
-function detectMode(t){if(TRAUMA_RE.test(t))return 'tr';const y=ageYears(t);if(PEDS_RE.test(t))return 'pd';if(y!=null)return y<18?'pd':'adult';if(PEDS_WEAK.test(t))return 'pd';return null}
+const ageYears=t0=>{const t=t0.replace(/\b(?:in|within|for|over|past|last|recent)\s+(?:the\s+)?(?:recent\s+|past\s+|last\s+)?\d+\s*(?:years?|yrs?)\b/gi,' ');const m=ABBR_Y.exec(t)?[0,ABBR_Y.exec(t)[1]]:t.match(/(\d+)\s*(?:歲|[- ]?years?[- ]?old|\s?y\/?o\b|\s?yrs?\b)/i)||t.match(/\b(\d{1,3})\s?(?:[MF](?!\s*height)\b|\/\s?[MFmf]\b)/);return m?+m[1]:null};
+const PEDS_WEAK=/\bTOCC\b|\bactivity\b|\bappetite\b|\bNSD\b|\bBW\s*\d|\b(?:AGE|URI) S\/S\b|febrile convulsion|\bg6pd\w*|\bfx of (?:fever|URI)/i;
+function detectMode(t0){const t=fixTypos(t0).replace(/\bu\/o\b/gi,'y/o');if(isTraumaText(t))return 'tr';const y=ageYears(t);if(PEDS_RE.test(t))return 'pd';if(y!=null)return y<18?'pd':'adult';if(PEDS_WEAK.test(t))return 'pd';return null}
 /* 只在內容明顯屬於另一種病歷時才切換：外傷、小兒線索會切過去；在外傷或小兒病歷裡沒有線索時留在原處 */
 function autoMode(t){if(NL.dept){if(S.mode!==NL.dept)setMode(NL.dept);return}const d=detectMode(t);let m=S.mode;
  if(d==='tr')m='tr';else if(d==='pd'&&S.mode==='nt')m='pd';else if(d==='adult'&&S.mode==='pd')m='nt';
  if(m===S.mode)return;setMode(m);
  toast(m==='tr'?Z('內容像外傷，已切換到外傷病歷','Looks like trauma. Switched to the trauma chart.'):m==='pd'?Z('內容像小兒個案，已切換到小兒病歷','Looks like a pediatric case. Switched to the pediatric chart.'):Z('已切換到非外傷病歷','Switched to the non-trauma chart.'))}
-const TRAUMA_RE=/\bTA\b|\bfalling\b|\bfall(?:s)? (?:from|down|on|onto)\b|\bslipping\b|\bslip(?:ped)? down\b|after (?:a )?fall|contus\w*|\bL\/W\b|\bA\/W\b|hematoma|滑倒|\bsuture\b|plasty|ecchymos\w*|\bwound\b|\bcut\b|knife|\bhit by\b|被打|被砍|\bkicked\b|\bpunched\b|\bMVA\b|\bs\/p fall|\bslipped\b|\blaceration\b|\babrasion\b|\bcontusion\b|扭傷|扭到|拉傷|骨折|脫臼|挫傷|擦傷|撕裂傷|\b(?:sprain(?:ed)?|fracture[ds]?|dislocat\w+|contusion|bruis\w+|abrasion)\b|塞進|塞入|塞到|珠子|豆子|車禍|機車|自摔|撞|墜落|摔|跌倒|跌落|割傷|刺傷|砍|燒燙|燙傷|咬傷|外傷|壓傷|砸|爆炸|槍|魚刺|魚骨|魚鯁|異物|電焊|焊接|雪盲|紫外線|濺入|濺到|卡到|卡在|吞入|誤吞|鐵屑|\b(?:crash|collision|mvc|accident|fell|fall from|ground-level fall|stab(?:bed)?|laceration|burn(?:ed)?|scald|bite[nd]?|bitten|assault(?:ed)?|gunshot|blast|trauma|injur(?:y|ed)|crush(?:ed)?|struck|thrown|ejected|fish ?bone|foreign body|welding|welder|arc eye|flash burn|snow blindness|splash(?:ed)?|swallowed|stuck in)\b/i;
+const TRKW='trauma|injur\\w*|wound|abrasion|contus\\w*|fracture|fx|laceration|bruis\\w*|ecchymos\\w*|hematoma|swelling|bleeding|sprain\\w*|dislocat\\w+|burn|bite|cut|fall(?:ing)?|fell|slipp?(?:ing|ed)?|accident';
+const NEGT=new RegExp("\\b(?:no|denied|denies|deny|without|nil|negative for|r\\/o|rule out)\\b(?:\\s+[\\w/'-]+(?:\\s*(?:or|and)\\s+[\\w/'-]+)?){0,3}\\s+(?:"+TRKW+")\\b","gi");
+const HISTT=/\b(?:s\/p|status post|post|hx of|history of|old|prior|previous)\s+[^.;\n]{0,40}?(?:fracture|fx|trauma|injury|burn|cut|wound|plasty)\b|\bcompression fx\b|burst fracture|\b(?:fracture|fx)\b[^.;\n]{0,12}\bs\/p\b|\bh\/d\b[^.;\n]{0,40}hematoma|surgical wound|a\/w\b/gi;
+const TRAUMA_RE=/\bTA\b|\bMVA\b|\bMVC\b|\bRTA\b|交通事故|車禍|機車|自摔|\bfalling\b|\bfell\b|\bfall(?:s)? (?:from|down|on|onto)\b|\bslipp?(?:ing|ed)?\s*down\b|\bslid(?:e|ing) down\b|\bslipped\b|after (?:a )?fall|跌倒|跌落|墜落|摔|滑倒|撞|踢到|踩空|被.{0,6}打|打到|\bhit by\b|\bprojectile\b|\bopen wound\b|\blaceration\b|\bL\/W\b|撕裂傷|割傷|刺傷|刀傷|砍|\bstab(?:bed)?\b|\bassault(?:ed)?\b|\bassualt\w*|毆打|打鬥|暴力|鈍傷|\bcrash|collision|\baccident\b|\bgunshot|爆炸|燙傷|燒燙|咬傷|壓傷|\bcrush(?:ed)?\b|\bstruck\b|\bejected\b|contus\w*|abrasion|ecchymos\w*|sprain\w*|\bdislocat\w+|\bfracture[ds]?\b|\bbruis\w*|\bhematoma\b|魚刺|魚骨|異物|foreign body|電焊|濺入|\bsplash(?:ed)?\b|\bswallowed\b|\bfish ?bone\b|扭傷|扭到|拉傷|骨折|脫臼|挫傷|擦傷|外傷|\binjur(?:y|ed)\b|\bburn(?:ed)?\b|\bscald\b|\bbite[nd]?\b|\bbitten\b|\bcut\b|\bsuture\b|\bwelding\b|\barc eye\b|塞進|塞入|塞到|珠子|豆子|雪盲|紫外線|卡到|卡在|吞入|誤吞|鐵屑/i;
+const isTraumaText=txt=>TRAUMA_RE.test(txt.replace(NEGT,' ').replace(HISTT,' '));
 async function runAi(){const t=S.nl.trim();if(!t){NL.msg=Z('請先輸入文字。','Please enter some text first.');renderNL();return}if(!SMP)return;
  autoMode(t);
  nlCtl=new AbortController();NL.busy=true;NL.msg=Z('AI 解析中…','AI is parsing…');renderNL();
