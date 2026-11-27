@@ -635,7 +635,17 @@ function row(e, regionKey, idx){
 
 function bindRows(root){
   root.querySelectorAll(".code[data-code]").forEach(el=>{
-    if(el.dataset.code) el.addEventListener("click", ()=>copyText(el.dataset.code));
+    if(el.dataset.code) el.addEventListener("click", ()=>{
+      const code = el.dataset.code;
+      const btn = el.closest("tr") && el.closest("tr").querySelector(".addbtn");
+      let added = false;
+      if(btn && !state.basket.some(b=>b.code===code)){
+        state.basket.push({code, name:btn.dataset.name, side:btn.dataset.side||""});
+        renderBasket(); added = true;
+      }
+      copyText(code);
+      if(added) showToast("已複製並加入診斷：" + code);
+    });
   });
   root.querySelectorAll(".addbtn").forEach(el=>{
     el.addEventListener("click", ()=>{
