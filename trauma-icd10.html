@@ -145,6 +145,13 @@
     padding:2px 10px; font-size:13px; display:flex; gap:6px; align-items:center;
   }
   .chip b{font-family:Consolas,monospace;}
+  .basket .dx{flex:1 1 100%; display:none; flex-direction:column; gap:4px;}
+  .basket.has .dx{display:flex;}
+  .basket .dx .dxhead{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--sub);}
+  .basket .dx select{font-size:12.5px; padding:2px 4px; border-radius:6px; border:1px solid var(--line); font-family:inherit;}
+  .basket .dx label{display:inline-flex; align-items:center; gap:3px; cursor:pointer;}
+  @media (max-width:640px){ .basket .dx .dxhead span{display:none;} .basket .dx textarea{min-height:52px; max-height:18vh;} .basket{max-height:48vh; overflow:auto;} }
+  .basket .dx textarea{width:100%; min-height:62px; max-height:24vh; resize:vertical; border-radius:8px; border:1.5px solid var(--line); padding:6px 8px; font-size:14px; line-height:1.6; font-family:inherit; box-sizing:border-box;}
   .chip span{cursor:pointer; color:var(--sub); font-weight:700;}
   .chip span:hover{color:var(--lac);}
 
@@ -260,6 +267,20 @@
   <div class="chips" id="chips"><span style="font-size:13px;color:var(--sub)">按各列「＋加入」收集多筆診斷碼</span></div>
   <button class="btn primary" id="copyAll">複製全部</button>
   <button class="btn" id="clearAll">清空</button>
+  <div class="dx">
+    <div class="dxhead"><b>診斷書文字</b>
+      <select id="dxFmt" aria-label="診斷書格式">
+        <option value="zhc">中文診斷（代碼）</option>
+        <option value="zh">只有中文診斷</option>
+        <option value="c">只有代碼</option>
+      </select>
+      <label><input type="checkbox" id="dxNum" checked>編號</label>
+      <label><input type="checkbox" id="dxStage">加就診階段（初診/後續/後遺症）</label>
+      <span>可直接修改</span>
+      <button class="btn primary" id="copyDx" style="margin-left:auto">複製診斷</button>
+    </div>
+    <textarea id="dxText" spellcheck="false" placeholder="按各列「＋加入」後，這裡會自動寫出診斷文字，可直接複製貼到診斷書"></textarea>
+  </div>
 </div>
 
 <footer>
@@ -501,7 +522,7 @@ function copyText(t){
   const ta = document.createElement("textarea");
   ta.value = t; ta.style.position="fixed"; ta.style.opacity="0";
   document.body.appendChild(ta); ta.select();
-  try{ document.execCommand("copy"); showToast("已複製:" + t); }
+  try{ document.execCommand("copy"); showToast(t.length>40||t.includes("\n") ? "已複製診斷文字" : "已複製:" + t); }
   catch(e){ showToast("複製失敗,請手動選取"); }
   document.body.removeChild(ta);
 }
@@ -608,7 +629,7 @@ function row(e, regionKey, idx){
   return `<tr>
     <td class="name">${e.n}${note}</td>
     <td class="icd"><span class="code ${nocopy?"nocopy":""}" data-code="${nocopy?"":code}">${code}</span>${sidetag}</td>
-    <td class="act">${nocopy?"":`<button class="btn addbtn" data-code="${code}" data-name="${e.n}">＋加入</button>`}</td>
+    <td class="act">${nocopy?"":`<button class="btn addbtn" data-code="${code}" data-name="${e.n}" data-side="${side||""}">＋加入</button>`}</td>
   </tr>`;
 }
 
@@ -620,15 +641,42 @@ function bindRows(root){
     el.addEventListener("click", ()=>{
       const code = el.dataset.code;
       if(!state.basket.some(b=>b.code===code)){
-        state.basket.push({code, name:el.dataset.name});
+        state.basket.push({code, name:el.dataset.name, side:el.dataset.side||""});
         renderBasket(); showToast("已加入清單:" + code);
       }else showToast("清單中已有此碼");
     });
   });
 }
 
+function dxName(b){
+  let n = String(b.name||"");
+  n = n.replace(/[(（]([^()（）]*)[)）]/g, (m,inner)=>{
+    const keep = inner.split(/[,，;；]/).map(x=>x.trim()).filter(x=>/[\u4e00-\u9fff]/.test(x));
+    return keep.length ? "（"+keep.join("，")+"）" : "";
+  });
+  n = n.replace(/\s+/g," ").trim();
+  if((b.side==="R"||b.side==="L") && !/[左右]/.test(n)) n = (b.side==="R"?"右側":"左側") + n;
+  return n;
+}
+function dxStageOf(code){
+  if(!/^[ST]/.test(code) || code.length<7) return "";
+  const l = code.slice(-1);
+  return l==="A"?"（初診）": l==="D"?"（後續照護）": l==="S"?"（後遺症）":"";
+}
+function dxBuild(){
+  const f = $("#dxFmt").value, num = $("#dxNum").checked, st = $("#dxStage").checked;
+  return state.basket.map((b,k)=>{
+    const pre = num ? (k+1)+". " : "";
+    if(f==="c") return pre + b.code;
+    const nm = dxName(b) + (st ? dxStageOf(b.code) : "");
+    return pre + nm + (f==="zhc" ? "（"+b.code+"）" : "");
+  }).join("\n");
+}
+function renderDx(){ $("#dxText").value = dxBuild(); }
 function renderBasket(){
   const box = $("#chips");
+  document.querySelector(".basket").classList.toggle("has", state.basket.length>0);
+  renderDx();
   if(state.basket.length===0){
     box.innerHTML = `<span style="font-size:13px;color:var(--sub)">按各列「＋加入」收集多筆診斷碼</span>`;
     return;
@@ -683,7 +731,7 @@ function renderSearch(q){
       return `<tr>
         <td class="name">${h.name}<span class="note">${meta}</span></td>
         <td class="icd"><span class="code ${nocopy?"nocopy":""}" data-code="${nocopy?"":code}">${code}</span></td>
-        <td class="act">${nocopy?"":`<button class="btn addbtn" data-code="${code}" data-name="${h.name}">＋加入</button>`}</td>
+        <td class="act">${nocopy?"":`<button class="btn addbtn" data-code="${code}" data-name="${h.name}" data-side="${h.raw?"":(h.side||"")}">＋加入</button>`}</td>
       </tr>`;}).join("") + `</table>`;
   }
   result.innerHTML = html;
@@ -757,6 +805,14 @@ $("#copyAll").addEventListener("click", ()=>{
   copyText(state.basket.map(b=>b.code).join(", "));
 });
 $("#clearAll").addEventListener("click", ()=>{ state.basket=[]; renderBasket(); });
+$("#dxFmt").addEventListener("change", renderDx);
+$("#dxNum").addEventListener("change", renderDx);
+$("#dxStage").addEventListener("change", renderDx);
+$("#copyDx").addEventListener("click", ()=>{
+  const t = $("#dxText").value;
+  if(!t.trim()){ showToast("診斷欄是空的"); return; }
+  copyText(t);
+});
 
 setAccent();
 
